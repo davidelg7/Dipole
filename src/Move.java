@@ -13,7 +13,7 @@ public class Move {
     static final int CAPTURE=2;
 
     public Move(int fromI, int fromJ, int toI, int toJ, int n,int type) {
-        if (type!=0||type!=1||type!=2) throw new IllegalArgumentException("Type must be (0,1,2) value found "+type);
+        if (!(type==0||type==1||type==2)) throw new IllegalArgumentException("Type must be (0,1,2) value found "+type);
         this.fromI = fromI;
         this.fromJ = fromJ;
         this.toI = toI;
