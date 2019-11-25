@@ -9,7 +9,7 @@ public class Board {
     private int WHITE=1;
     enum dir{N,NE,E,SE,SW,W,NW};
     public Board(){
-        board[7][4]=12;
+        board[5][2]=4;
         board[0][3]=-12;
     }
     private boolean isPositionOfPlayer(int i, int j, int player){
@@ -19,7 +19,18 @@ public class Board {
         return board[i][j]*player>0;
     }
     public static void main(String...args){
-        System.out.println(new Board().getPossibleMoves(1));
+        System.out.println("TEST GENERA MOSSE");
+        Board b= new Board();
+
+        List<Move>moves= b.getPossibleMoves(1);
+        for (Move m:moves){
+            b.makeMove(m);
+            System.out.println(m);
+            System.out.println(b);
+            System.out.println("-------------------------");
+            b.undoMove(m);
+        }
+        System.out.println();
     }
     public List<Move> getPossibleMoves(int player){
         List<Move>moves= new LinkedList<>();
@@ -61,7 +72,14 @@ public class Board {
 
     }
     public void makeMove(Move m){
-        board[m.getFromI()][m.getFromJ()]
+
+        board[m.getFromI()][m.getFromJ()]-=m.getN();
+        board[m.getToI()][m.getToJ()]+=m.getN();
+    }
+    public void undoMove(Move m){
+
+        board[m.getFromI()][m.getFromJ()]+=m.getN();
+        board[m.getToI()][m.getToJ()]-=m.getN();
     }
     @Override
     public String toString() {
