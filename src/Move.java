@@ -8,17 +8,16 @@ public class Move {
     private int toI;
     private int toJ;
     private int n;
-    static final int BASE=0;
-    static final int MERGE=1;
-    static final int CAPTURE=2;
+    public static enum Type{BASE,MERGE,CAPTURE}
+    private  Type type;
 
-    public Move(int fromI, int fromJ, int toI, int toJ, int n,int type) {
-        if (!(type==0||type==1||type==2)) throw new IllegalArgumentException("Type must be (0,1,2) value found "+type);
+    public Move(int fromI, int fromJ, int toI, int toJ, int n,Type type) {
         this.fromI = fromI;
         this.fromJ = fromJ;
         this.toI = toI;
         this.toJ = toJ;
         this.n=n;
+        this.type=type;
     }
 
     public int getFromI() {
@@ -61,6 +60,10 @@ public class Move {
         this.n = n;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -70,12 +73,13 @@ public class Move {
                 fromJ == move.fromJ &&
                 toI == move.toI &&
                 toJ == move.toJ &&
-                n == move.n;
+                n == move.n &&
+                type == move.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fromI, fromJ, toI, toJ, n);
+        return Objects.hash(fromI, fromJ, toI, toJ, n, type);
     }
 
     @Override
@@ -86,6 +90,7 @@ public class Move {
                 ", toI=" + toI +
                 ", toJ=" + toJ +
                 ", n=" + n +
+                ", type=" + type +
                 '}';
     }
 }
