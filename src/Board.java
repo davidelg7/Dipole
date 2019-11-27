@@ -9,7 +9,7 @@ public class Board {
     private int WHITE=1;
     enum dir{N,NE,E,SE,SW,W,NW};
     public Board(){
-        board[5][2]=4;
+        board[7][4]=12;
         board[0][3]=-12;
     }
     private boolean isPositionOfPlayer(int i, int j, int player){
@@ -22,7 +22,15 @@ public class Board {
         System.out.println("TEST GENERA MOSSE");
         Board b= new Board();
 
-        List<Move>moves= b.getPossibleMoves(1);
+        List<Move>moves= b.getPossibleMoves(b.WHITE);
+        for (Move m:moves){
+            b.makeMove(m);
+            System.out.println(m);
+            System.out.println(b);
+            System.out.println("-------------------------");
+            b.undoMove(m);
+        }
+        moves= b.getPossibleMoves(b.BLACK);
         for (Move m:moves){
             b.makeMove(m);
             System.out.println(m);
@@ -40,18 +48,48 @@ public class Board {
             //per ogni colonna
             for (int j=0;j<8;j++){
                 //se la cella appartiene al giocatore considerato
-                if(isPositionOfPlayer(i,j,player)){
                     //considero il giocatore bianco
-                    if(player==WHITE){}
-                        int riga=i,colonna=j;
-                    //genero le mosse in verticale
+                    if(player==WHITE&&isPositionOfPlayer(i,j,player)) {
+                        int riga = i, colonna = j;
+                        //genero le mosse in verticale
 
-                    //k rappresenta il numero di celle di cui mi sposto
-                    //fin tanto che mi sposto al massimo del numero di celle che ho, e non vado fuori dalla Board
-                        for(int k=2;k<=Math.abs(board[i][j])&&riga-k>=0;k+=2) {
-                            moves.add(new Move(i,j,riga-k,colonna,k,0));
-                        }
+                        //k rappresenta il numero di celle di cui mi sposto
+                        //fin tanto che mi sposto al massimo del numero di celle che ho, e non vado fuori dalla Board
+                        for (int k = 2; k <= Math.abs(board[i][j]) && riga - k >= 0; k += 2)
+                            moves.add(new Move(i, j, riga - k, colonna, k, Move.Type.BASE));
 
+                        //genero le mosse sulla diagonale principale per il bianco
+                        for(int k=1;k<=Math.abs(board[i][j])&&riga-k>=0&&colonna-k>=0;k++)
+                            moves.add(new Move(i,j,riga-k,colonna-k,k, Move.Type.BASE));
+
+                        //genero le mosse sulla diagonale principale per il bianco
+                        for(int k=1;k<=Math.abs(board[i][j])&&riga-k>=0&&colonna+k<8;k++)
+                            moves.add(new Move(i,j,riga-k,colonna+k,k, Move.Type.BASE));
+
+
+
+
+                    }
+                    else if(player==BLACK&&isPositionOfPlayer(i,j,player)){
+                        int riga = i, colonna = j;
+                        //genero le mosse in verticale
+
+                        //k rappresenta il numero di celle di cui mi sposto
+                        //fin tanto che mi sposto al massimo del numero di celle che ho, e non vado fuori dalla Board
+                        for (int k = 2; k <= Math.abs(board[i][j]) && riga + k <8; k += 2)
+                            moves.add(new Move(i, j, riga + k, colonna, -k, Move.Type.BASE));
+
+
+                        //genero le mosse sulla diagonale principale per il nero
+                        for(int k=1;k<=Math.abs(board[i][j])&&riga+k<8&&colonna+k<8;k++)
+                            moves.add(new Move(i,j,riga+k,colonna+k,-k, Move.Type.BASE));
+
+                        //genero le mosse sulla diagonale secondaria per il nero
+                        for(int k=1;k<=Math.abs(board[i][j])&&riga+k<8&&colonna-k>=0;k++)
+                            moves.add(new Move(i,j,riga+k,colonna-k,-k, Move.Type.BASE));
+
+
+                    }
 
 
 
@@ -62,7 +100,6 @@ public class Board {
 
             }
 
-        }
 
 
 
