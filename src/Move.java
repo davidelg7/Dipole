@@ -8,16 +8,40 @@ public class Move {
     private int toI;
     private int toJ;
     private int n;
-    public static enum Type{BASE,MERGE,CAPTURE}
+    private int oldN;
+    private int playerMover;
+
+    public int getOldN() {
+        return oldN;
+    }
+
+    public void setOldN(int oldN) {
+        this.oldN = oldN;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public static enum Type{BASE,MERGE,CAPTURE,DEL,STALL}
     private  Type type;
 
-    public Move(int fromI, int fromJ, int toI, int toJ, int n,Type type) {
+    public Move(int fromI, int fromJ, int toI, int toJ, int n,int playerMover,Type type) {
         this.fromI = fromI;
         this.fromJ = fromJ;
         this.toI = toI;
         this.toJ = toJ;
         this.n=n;
         this.type=type;
+        this.playerMover=playerMover;
+    }
+
+    public int getPlayerMover() {
+        return playerMover;
+    }
+
+    public void setPlayerMover(int playerMover) {
+        this.playerMover = playerMover;
     }
 
     public int getFromI() {
