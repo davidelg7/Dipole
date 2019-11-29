@@ -2,7 +2,7 @@
 
 import java.util.Objects;
 
-public class Move {
+public class Move implements Comparable<Move>{
     private int fromI;
     private int fromJ;
     private int toI;
@@ -23,7 +23,13 @@ public class Move {
         this.type = type;
     }
 
-    public static enum Type{BASE,MERGE,CAPTURE,DEL,STALL}
+    @Override
+    public int compareTo(Move o) {
+
+        return type.compareTo(o.type);
+    }
+
+    public static enum Type{CAPTURE,MERGE,BASE,DEL,STALL}
     private  Type type;
 
     public Move(int fromI, int fromJ, int toI, int toJ, int n,int playerMover,Type type) {
@@ -114,6 +120,8 @@ public class Move {
                 ", toI=" + toI +
                 ", toJ=" + toJ +
                 ", n=" + n +
+                ", oldN=" + oldN +
+                ", playerMover=" + playerMover +
                 ", type=" + type +
                 '}';
     }
