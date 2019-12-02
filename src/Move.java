@@ -30,6 +30,7 @@ public class Move implements Comparable<Move>{
     }
 
     public static enum Type{CAPTURE,MERGE,BASE,DEL,STALL}
+
     private  Type type;
 
     public Move(int fromI, int fromJ, int toI, int toJ, int n,int playerMover,Type type) {
@@ -103,9 +104,7 @@ public class Move implements Comparable<Move>{
                 fromJ == move.fromJ &&
                 toI == move.toI &&
                 toJ == move.toJ &&
-                n == move.n &&
-                type == move.type;
-    }
+                n == move.n;}
 
     @Override
     public int hashCode() {

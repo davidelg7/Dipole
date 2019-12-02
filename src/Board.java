@@ -1,17 +1,19 @@
 
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import com.sun.xml.internal.bind.v2.model.core.MaybeElement;
+
+import java.util.*;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 public class Board {
 
     private int [][] board= new int[8][8];
     public static final int BLACK=-1;
     public static final int WHITE=1;
-    private int N_THREADS=1;
+    private boolean updated=true;
+    private List<Move> possibleMoves;
+    private int N_THREADS=2;
 
     public int otherPlayer(int opt) {
         return opt==WHITE?BLACK:opt==BLACK?WHITE:0;
@@ -39,10 +41,17 @@ public class Board {
         return WHITE;
     }
 
-    enum dir{N,NE,E,SE,SW,W,NW};
     public Board(){
         board[0][3]=12*BLACK;
         board[7][4]=12*WHITE;
+//        board[7][2]=2*WHITE;
+//        board[7][4]=2*WHITE;
+//        board[7][6]=2*WHITE;
+//        board[3][4]=4*WHITE;
+//
+//        board[6][3]=2*BLACK;
+//        board[6][5]=2*BLACK;
+
     }
     private boolean isPositionOfPlayer(int i, int j, int player){
         //se player =-1 e board[i][j]=4 -> board[i][j]*player=-4 quindi la cella non appartiene al giocatore
@@ -53,6 +62,7 @@ public class Board {
     public static void main(String...args){
         System.out.println("TEST GENERA MOSSE");
         Board b= new Board();
+
         System.out.println(b);
         List<Move>moves= b.getPossibleMoves(b.BLACK);
         List<Move.Type> quali=new LinkedList<>(Arrays.asList(Move.Type.DEL));
@@ -76,8 +86,12 @@ public class Board {
         }*/
         System.out.println(moves.size());
     }
-
+    public List<Move> getAllOfType(int player,Move.Type type){
+        return getPossibleMoves(player).stream().filter(f->f.getType().equals(type)).collect(Collectors.toList());
+    }
     public List<Move> getPossibleMoves(int player){
+        if (!updated) return possibleMoves;
+
         List<Move>moves= new LinkedList<>();
         List<Future<List<Move>>> futures=new LinkedList<>();
         ExecutorService es = Executors.newFixedThreadPool(N_THREADS);
@@ -99,10 +113,21 @@ public class Board {
 
             es.shutdown();
 
-        if(moves.isEmpty())
-            moves.add(new Move(-1,-1,-1,-1,0,player, Move.Type.STALL));
+        if(moves.isEmpty()){
+            int i=0;
+            int j=0;
+            for (int k=0;k<8;k++)
+                for (int s=0;s<8;s++)
+                    if(board[k][s]*player>0){
+                        j=s;
+                        i=k;
+                        break;}
+            moves.add(new Move(i,j,i,j,0,player, Move.Type.STALL));
+        }
+
+        possibleMoves=moves;
         Collections.sort(moves);
-        return moves;
+        return moves;//.subList(0, Math.min(10,moves.size()));
 
     }
     private Callable<List<Move>> getMoves(int[][] board,int i,int j,int player){
@@ -128,8 +153,17 @@ public class Board {
                             moves.add(new Move(riga, colonna, riga - k, colonna, k,WHITE , Move.Type.CAPTURE));
                         else
                         if(board[riga-k][colonna]==0)
-
                             moves.add(new Move(riga, colonna, riga - k, colonna, k,WHITE , Move.Type.BASE));
+                   //genero le mosse capture a destra per il bianco
+                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna + k <8 ; k += 2)
+                        if(isPositionOfPlayer(riga,colonna+k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna+k])&&k>=Math.abs(board[riga][colonna+k]))
+                                moves.add(new Move(riga, colonna, riga , colonna+k, k,WHITE , Move.Type.CAPTURE));
+
+                   //genero le mosse capture a sinistra per il bianco
+                   for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna - k >= 0; k += 2)
+                       if(isPositionOfPlayer(riga,colonna-k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna-k])&&k>=Math.abs(board[riga][colonna-k]))
+                           moves.add(new Move(riga, colonna, riga , colonna-k, k,WHITE , Move.Type.CAPTURE));
+
 
                     //genero le mosse sulla diagonale principale per il bianco
                     for(int k=1;k<=Math.abs(board[riga][colonna])&&riga-k>=0&&colonna-k>=0;k++)
@@ -175,13 +209,14 @@ public class Board {
                         if(k>=Math.abs(board[riga+k][colonna+k]))
                             if (isPositionOfPlayer(riga+k,colonna+k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna+k]))
                             moves.add(new Move(riga,colonna,riga+k,colonna+k,k,WHITE , Move.Type.CAPTURE));
-
+                    boolean v=false,D=false,d=false;
                     int minOut=Integer.MAX_VALUE;
                     int k=0;
                     //controllo in verticale quanto possa uscire
                     for (; k <= Math.abs(board[riga][colonna]) && riga - k >= 0; k += 1)
                         continue;
                     if(k>0)k--;
+                    if (minOut==Math.min(k,minOut))v=true;
                     minOut=Math.min(k,minOut);
 
                     //controllo sulla diagonale secondaria quanto possa uscire
@@ -189,12 +224,14 @@ public class Board {
                     for (k=0; k <= Math.abs(board[riga][colonna]) && riga - k >=0&&colonna+k<8; k += 1)
                         continue;
                     if(k>0)k--;
+                    if (minOut==Math.min(k,minOut))d=true;
                     minOut=Math.min(k,minOut);
 
                     //controllo sulla diagonale principale quanto possa uscire
                     for (k=0; k <= Math.abs(board[riga][colonna]) && riga - k >=0&&colonna-k>=0; k += 1)
                         continue;
                     if(k>0)k--;
+                    if (minOut==Math.min(k,minOut))D=true;
                     minOut=Math.min(k,minOut);
 
                     //outV è il minimo numero di celle del percorso più vicino al bordo
@@ -203,8 +240,14 @@ public class Board {
                     if(minOut!=board[i][j])
                         // System.out.println("PUOI ELIMINARE da"+(minOut+1)+"a "+board[i][j]);
                         for(int out=minOut+1;out<=board[i][j];out++)
-                            moves.add(new Move(riga,colonna,riga,colonna,out,WHITE , Move.Type.DEL));
-
+                            if (v&&riga-out<0)
+                                moves.add(new Move(riga,colonna,riga-out,colonna,out,WHITE , Move.Type.DEL));
+                            else {
+                                if (d&&riga-out<0||colonna+out>7)
+                                    moves.add(new Move(riga, colonna, riga - out, colonna + out, out, WHITE, Move.Type.DEL));
+                                else if (D&&riga-out<0||colonna-out<0)
+                                    moves.add(new Move(riga, colonna, riga - out, colonna - out, out, WHITE, Move.Type.DEL));
+                            }
 
                 }
                 else if(player==BLACK&&isPositionOfPlayer(i,j,BLACK)){
@@ -220,6 +263,16 @@ public class Board {
                         else
                         if(board[riga+k][colonna]==0)
                             moves.add(new Move(riga, j, riga + k, colonna, k,BLACK , Move.Type.BASE));
+
+                    //genero le mosse capture a destra per il nero
+                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna + k <8; k += 2)
+                        if(isPositionOfPlayer(riga,colonna+k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna+k])&&k>=Math.abs(board[riga][colonna+k]))
+                            moves.add(new Move(riga, colonna, riga , colonna+k, k,BLACK , Move.Type.CAPTURE));
+
+                    //genero le mosse capture a sinistra per il nero
+                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna - k >= 0; k += 2)
+                        if(isPositionOfPlayer(riga,colonna-k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna-k])&&k>=Math.abs(board[riga][colonna-k]))
+                            moves.add(new Move(riga, colonna, riga , colonna-k, k,BLACK , Move.Type.CAPTURE));
 
 
                     //genero le mosse sulla diagonale principale per il nero
@@ -264,13 +317,14 @@ public class Board {
                             moves.add(new Move(riga,colonna,riga-k,colonna-k,k,BLACK , Move.Type.CAPTURE));
 
 
-
+                    boolean v=false,D=false,d=false;
                     int minOut=Integer.MAX_VALUE;
                     int k=0;
                     //controllo in verticale quanto possa uscire
-                    for (; k <= Math.abs(board[riga][colonna]) && riga + k <8; k += 1)
+                    for (; k <= Math.abs(board[riga][colonna]) && riga + k <8; k += 2)
                         continue;
                     if(k>0)k--;
+                    if (minOut==Math.min(k,minOut))v=true;
                     minOut=Math.min(k,minOut);
 
                     //controllo sulla diagonale secondaria quanto possa uscire
@@ -278,20 +332,34 @@ public class Board {
                     for (k=0; k <= Math.abs(board[riga][colonna]) && riga + k <8&&colonna-k>=0; k += 1)
                         continue;
                     if(k>0)k--;
+                    if (minOut==Math.min(k,minOut))d=true;
+
                     minOut=Math.min(k,minOut);
 
                     //controllo sulla diagonale principale quanto possa uscire
                     for (k=0; k <= Math.abs(board[riga][colonna]) && riga + k <8&&colonna+k<8; k += 1)
                         continue;
                     if(k>0)k--;
+                    if (minOut==Math.min(k,minOut))D=true;
                     minOut=Math.min(k,minOut);
 
                     //outV è il minimo numero di celle del percorso più vicino al bordo
                     //se non sono riuscito a muovere le pedine senza uscire dalla scacchiera significa che
                     //potenzialmente ho mosse che mi consentono di eliminarne
-                    if(minOut!=board[i][j])
+                    if(minOut!=board[i][j]) {
                         for (int out = minOut + 1; out <= Math.abs(board[i][j]); out++)
-                            moves.add(new Move(riga, colonna, riga, colonna, out, BLACK, Move.Type.DEL));
+                            if (D&&riga+out>=8||colonna+out>=8)
+                                moves.add(new Move(riga, colonna, riga + out, colonna + out, out, BLACK, Move.Type.DEL));
+                            else{
+
+                            if (d&&riga+out>=8||colonna-out<0 )
+                                moves.add(new Move(riga, colonna, riga + out, colonna - out, out, BLACK, Move.Type.DEL));
+
+                            else if (v&&riga+out>=8)
+                                moves.add(new Move(riga, colonna, riga + out, colonna, out, BLACK, Move.Type.DEL));
+                    }
+                    }
+
                 }
                 return moves;
             }
@@ -358,11 +426,15 @@ public class Board {
             sb.append(i+"\t");
         sb.append("\n");
         for (int i=0;i<8;i++) {
+
             sb.append(i+":\t");
             for (int j = 0; j < 7; j++) {
-                sb.append(board[i][j]+"\t|");
+                String s=board[i][j]>0?"W":board[i][j]<0?"B":"";
+
+                sb.append(Math.abs(board[i][j])+s+"\t|");
             }
-            sb.append(board[i][7]+"\n");
+            String s=board[i][7]>0?"W":board[i][7]<0?"B":"";
+            sb.append(Math.abs(board[i][7])+s+"\n");
             sb.append("\t");
 
             for (int j = 0; j < 8; j++) {

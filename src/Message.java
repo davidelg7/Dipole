@@ -68,6 +68,6 @@ public class Message {
 
     public static void main(String... args){
 
-        System.out.println(new Message(5,4,7,2).message);
+        System.out.println(new Message(6,3,7,4).message);
     }
 }

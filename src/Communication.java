@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Communication implements Runnable {
@@ -58,13 +59,17 @@ public class Communication implements Runnable {
             toI = fromI - numMoves;
             toJ = (direction == "NE") ? fromJ + numMoves : fromJ - numMoves;
         }
-        return new int[]{fromI, fromJ, toI, toJ};
+        return new int[]{fromI, fromJ, toI, toJ,numMoves};
     }
 
     @Override
     public void run() {
         while (true) {
             try {
+
+                int player=0;
+                Board b= new Board();
+
                 String line;
                 BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
                 boolean more = true;
@@ -74,7 +79,8 @@ public class Communication implements Runnable {
                         //mi dice se sto giocando come bianco o nero
                         StringTokenizer st = new StringTokenizer(line, " ");
                         st.nextToken();
-                        /*Giocatore g = */st.nextToken();
+                        int valPlayer=Integer.parseInt(st.nextToken());
+                        player=valPlayer==1?Board.BLACK:Board.WHITE;
                         /**GIOCATORE = g**/
                     }
                     if (line.contains("OPPONENT_MOVE")/*LINE CONTAINS OPPONENT MOVE*/) {
@@ -83,10 +89,18 @@ public class Communication implements Runnable {
                         String move = st.nextToken();
                         StringTokenizer st2 = new StringTokenizer(move, ",");
                         //TODO metodo che traduce le mosse dell'avversario e le memorizza in un campo dell'agente intelligente (AgenteIntelligente.opponentMove = [fromI,fromJ,toI,toJ])
-                        /**AgenteIntelligente.opponentMove = **/traduciMossa(st2.nextToken(), st2.nextToken(), Integer.parseInt(st2.nextToken()));
+                        /**AgenteIntelligente.opponentMove = **/
+                        int [] arr=traduciMossa(st2.nextToken(), st2.nextToken(), Integer.parseInt(st2.nextToken()));
+                        Move m= new Move(arr[0],arr[1],arr[2],arr[3],arr[4],b.otherPlayer(player),null);
+                        List<Move> moves= b.getPossibleMoves(b.otherPlayer(player));
+                        m=moves.get(moves.indexOf(m));
+                        b.makeMove(m);
+
                     }
-                    if (line == "YOUR_TURN") {
-                        this.sendMessage(/*AGENTE_INTELLIGENTE.message*/new Message(1, 1, 1, 1));//invia la mia mossa
+                    if (line.contains("YOUR_TURN")) {
+                        Move m= Algorithms.AlphaBetaAlg(b,player,new H2(),3);
+                        b.makeMove(m);
+                        this.sendMessage(/*AGENTE_INTELLIGENTE.message*/new Message(m.getFromI(), m.getFromJ(), m.getToI(), m.getToJ()));//invia la mia mossa
                         more = false;
                     }
                     if (line == null)
@@ -96,5 +110,12 @@ public class Communication implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+    public static void main(String... args){
+        Thread t = new Thread(new Communication("localhost",8901));
+
+        t.setDaemon(true);
+        t.start();
+
     }
 }

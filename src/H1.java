@@ -1,4 +1,4 @@
-public class H1 extends Heuristics {
+public class H1 {
 
     public int eval(Board board, int player) {
         int evalFromI = evalfromI(board, player);
@@ -16,19 +16,19 @@ public class H1 extends Heuristics {
             if(board.get(0,3) <= -1.5){
                 sum+=3;
                 if(board.get(0,3) <= -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(0,3) > -1.5){
                 sum+=3;
                 if(board.get(4,3) <= -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(4,3) > -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -37,19 +37,19 @@ public class H1 extends Heuristics {
             if(board.get(7,4) <= 1.5){
                 sum+=3;
                 if(board.get(3,4) <= 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(3,4) > 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(7,4) > 1.5){
                 sum+=3;
                 if(board.get(0,3) <= -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -63,19 +63,19 @@ public class H1 extends Heuristics {
             if(board.get(0,3) <= -1.5){
                 sum+=3;
                 if(board.get(0,3) <= -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(0,3) > -1.5){
                 sum+=3;
                 if(board.get(4,3) <= -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(4,3) > -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -84,19 +84,19 @@ public class H1 extends Heuristics {
             if(board.get(7,4) <= 1.5){
                 sum+=3;
                 if(board.get(3,4) <= 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(3,4) > 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(7,4) > 1.5){
                 sum+=3;
                 if(board.get(0,3) <= -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -110,19 +110,19 @@ public class H1 extends Heuristics {
             if(board.get(0,3) <= -1.5){
                 sum+=3;
                 if(board.get(0,3) <= -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(0,3) > -1.5){
                 sum+=3;
                 if(board.get(4,3) <= -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(4,3) > -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -131,19 +131,19 @@ public class H1 extends Heuristics {
             if(board.get(7,4) <= 1.5){
                 sum+=3;
                 if(board.get(3,4) <= 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(3,4) > 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(7,4) > 1.5){
                 sum+=3;
                 if(board.get(0,3) <= -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -157,19 +157,19 @@ public class H1 extends Heuristics {
             if(board.get(0,3) <= -1.5){
                 sum+=3;
                 if(board.get(0,3) <= -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(0,3) > -1.5){
                 sum+=3;
                 if(board.get(4,3) <= -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(4,3) > -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -178,19 +178,19 @@ public class H1 extends Heuristics {
             if(board.get(7,4) <= 1.5){
                 sum+=3;
                 if(board.get(3,4) <= 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(3,4) > 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(7,4) > 1.5){
                 sum+=3;
                 if(board.get(0,3) <= -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -204,19 +204,19 @@ public class H1 extends Heuristics {
             if(board.get(0,3) <= -1.5){
                 sum+=3;
                 if(board.get(0,3) <= -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -3.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(0,3) > -1.5){
                 sum+=3;
                 if(board.get(4,3) <= -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(4,3) > -0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }
@@ -225,19 +225,19 @@ public class H1 extends Heuristics {
             if(board.get(7,4) <= 1.5){
                 sum+=3;
                 if(board.get(3,4) <= 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(3,4) > 0.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
             else if(board.get(7,4) > 1.5){
                 sum+=3;
                 if(board.get(0,3) <= -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
                 else if(board.get(0,3) > -4.5){
-                    sum=sum*sum;
+                    sum=sum+sum;
                 }
             }
         }

@@ -1,6 +1,7 @@
 
 public abstract class Heuristics {
 
-    abstract int eval(Board board,int player);
+    abstract int eval(Board board,Move move);
+
 
 }
