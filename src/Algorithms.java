@@ -68,7 +68,7 @@ public class Algorithms {
 
             List<Move> moves=b.getPossibleMoves(player);
 
-            if(currDepth==depthMax||moves.isEmpty()){ return new Pair(h.eval(b,mov),mov);}
+            if(currDepth==depthMax||moves.isEmpty()){ return new Pair(h.eval(b,mov,1,currDepth),mov);}
 
 
             if(player==optimizer) {

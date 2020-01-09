@@ -9,9 +9,9 @@ public class Algorithms2 {
 
 
     }
-    private static Pair<Integer,Move> alphaBetaPruning (int player,int turn,Move m ,Board board,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
+    private static Pair<Double,Move> alphaBetaPruning (int player,int turn,Move m ,Board board,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
         if (currentPly++ == maxPly ) {
-            return new Pair<>(h.eval(board,m),m);
+            return new Pair<>(h.eval(board,m,1,0),m);
         }
 
         if (turn == player) {
@@ -21,7 +21,7 @@ public class Algorithms2 {
         }
     }
 
-    private static Pair<Integer,Move> getMax (int player,int turn, Board board,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
+    private static Pair<Double,Move> getMax (int player,int turn, Board board,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
         Move indexOfBestMove=null;
         List<Move>moves=board.getPossibleMoves(turn);
         if(Math.random()>0.75) Collections.shuffle(moves);
@@ -29,8 +29,8 @@ public class Algorithms2 {
 
             Board modifiedBoard = board.copy();
             modifiedBoard.makeMove(theMove);
-            Pair<Integer,Move> min= alphaBetaPruning(player,board.otherPlayer(turn),theMove, modifiedBoard, alpha, beta, currentPly,maxPly,h);
-            int score=min.getKey();
+            Pair<Double,Move> min= alphaBetaPruning(player,board.otherPlayer(turn),theMove, modifiedBoard, alpha, beta, currentPly,maxPly,h);
+            double score=min.getKey();
             if (score > alpha) {
                 alpha = score;
                 indexOfBestMove = theMove;
@@ -47,7 +47,7 @@ public class Algorithms2 {
     }
 
 
-    private static Pair<Integer,Move> getMin (int player,int turn, Board board ,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
+    private static Pair<Double,Move> getMin (int player,int turn, Board board ,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
         Move indexOfBestMove = null;
 
         List<Move>moves=board.getPossibleMoves(turn);
@@ -57,8 +57,8 @@ public class Algorithms2 {
             Board modifiedBoard = board.copy();
             modifiedBoard.makeMove(theMove);
 
-            Pair<Integer,Move> max= alphaBetaPruning(player,board.otherPlayer(turn),theMove, modifiedBoard, alpha, beta, currentPly,maxPly,h);
-            int score=max.getKey();
+            Pair<Double,Move> max= alphaBetaPruning(player,board.otherPlayer(turn),theMove, modifiedBoard, alpha, beta, currentPly,maxPly,h);
+            double score=max.getKey();
 
             if (score < beta) {
                 beta = score;

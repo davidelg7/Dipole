@@ -6,7 +6,7 @@ public class MainAIvsHuman {
 
 
 
-        Board b= new Board();
+        Board b= new Board(new H3());
 
         int player=Board.WHITE;
         int mover=Board.WHITE;
@@ -16,7 +16,7 @@ public class MainAIvsHuman {
             if (mover == player) {
                 System.out.println("GIOCATORE " + (player == Board.WHITE ? "WHITE" : "BLACK"));
                 Move bestMove = null;
-                bestMove = tab.AlphaBetaAlg(b, player, new H2(), 8);
+                bestMove = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b, player, 7);
 
                 System.out.println(bestMove);
                 b.makeMove(bestMove);

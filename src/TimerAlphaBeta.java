@@ -1,104 +1,115 @@
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
-public class TimerAlphaBeta extends Thread{
+public class TimerAlphaBeta {
 
-    private long startingTime;
-    private int msLimit=900;
-    private ExecutorService es = Executors.newFixedThreadPool(4);
-    private static final double MIN_SHUFFLE=0.98;
-    private static final double MAX_SHUFFLE=0.98;
+    private static long startingTime;
+    private static int msLimit = 900;
+    private static final double MIN_SHUFFLE = 0.1;
+    private static final double MAX_SHUFFLE = 0.1;
+    private static final double CUT = 0;
+    private static final int DIM = 12;
+    private static boolean timeOut= false;
+    private static  int depth=3;
+//    private static LinkedList<LinkedList<List<Number>>> levels= new LinkedList<>();
+    public static double AlphaBeta(Board b,Move move, int maxPlayer, int currPlayer,int currDepth, int maxDepth, double alpha, double beta){
+        if(getCurrentTime()>msLimit){
+            timeOut=true;
+//            levels.get(currDepth).getLast().add(b.eval(move,maxPlayer,1));
+            return b.eval(move,maxPlayer,1);
+        }
+        if (currDepth==maxDepth||b.checkWinner()!=0){
+            timeOut=false;
+//            levels.get(currDepth).getLast().add(b.eval(move,maxPlayer,1));
+            return b.eval(move,maxPlayer,1);}
+        if(currPlayer==maxPlayer){
+            double best=Double.NEGATIVE_INFINITY;
+            List<Move> moves=b.getPossibleMoves(currPlayer);
+            shuffleWithProb(MAX_SHUFFLE,moves);
+            limit(DIM,moves);
+//            levels.get(currDepth+1).add(new LinkedList<>());
+            for (Move m:moves){
+                Board copy= b.copy();copy.makeMove(m);
+                double val = AlphaBeta(copy,m,maxPlayer,currPlayer*-1,currDepth+1,maxDepth,alpha,beta);
+                best=Math.max(best,val);
+                alpha=Math.max(alpha,best);
+                if(alpha>=beta){break;}
+            }
+//            levels.get(currDepth).getLast().add(best);
+            return best;
+        }
+        else{
+            double best=Double.POSITIVE_INFINITY;
+            List<Move> moves=b.getPossibleMoves(currPlayer);
+            shuffleWithProb(MIN_SHUFFLE,moves);
+            limit(DIM,moves);
+//            levels.get(currDepth+1).add(new LinkedList<>());
+            for (Move m:moves){
+                Board copy= b.copy();copy.makeMove(m);
+                double val = AlphaBeta(copy,m,maxPlayer,currPlayer*-1,currDepth+1,maxDepth,alpha,beta);
+                best=Math.min(best,val);
+                beta=Math.min(beta,best);
+                if(alpha>=beta){break;}
 
-
-
-
-    private FutureTask<Pair<Integer,Move>> alphaBetaPruningConcurrent(Board b, int player, Heuristics h, int depthMax){
-        List<Pair<Integer,Move>> bests=new LinkedList<>();
-       return null;
-
-
-
+            }
+//            levels.get(currDepth).getLast().add(best);
+            return best;
+        }
     }
-    public Move AlphaBetaAlg(Board b, int player, Heuristics h, int depthMax){
+    public static synchronized Move IterativeDeepeningAlphaBeta(Board b, int player, int depthMax){
         startingTime=System.currentTimeMillis();
-        return alphaBetaPruning(player,player,null,b,Double.NEGATIVE_INFINITY,Double.POSITIVE_INFINITY,0,depthMax,h).getValue();
+        Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,1);
 
+        for (int i = 2; i <=depthMax ; i++) {
 
-    }
-    private  Pair<Integer,Move> alphaBetaPruning (int player,int turn,Move m ,Board board,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
-        if (currentPly++ == maxPly ||getCurrentTime()>msLimit) {
-            return new Pair<>(h.eval(board,m),m);
+            Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
+            if (best.getValue()>m.getValue())break;
+            else
+                best=m;
         }
+        System.out.println("Scelgo "+best);
+        return best.getKey();
+    }
+    public static   Move AutoDeepeningAlphaBeta(Board b,int player){
+        if(!timeOut)depth+=1;
+        if (timeOut)depth-=1;
+        Move m =IterativeDeepeningAlphaBeta(b,player,depth);
+//        stampa();
+        return m;
+    }
+//    private static void stampa(){
+//        levels.stream().forEach(l-> System.out.println(l));
+//    }
+    private static synchronized Pair<Move,Double> AlphaBetaAlg2(Board b, int player, int depthMax){
+//        levels= new LinkedList<>();
+//            levels.add(new LinkedList<>(Arrays.asList(new LinkedList<>())));
 
-        if (turn == player) {
-            return getMax(player,turn ,board,alpha, beta, currentPly,maxPly,h);
-        } else {
-            return getMin(player,turn ,board,alpha, beta, currentPly,maxPly,h);
+        List<Move> moves= b.getLimitedPossibleMoves(player,DIM);
+        List<Double>max=moves.stream().map(m->{
+            Board copy= b.copy();
+            copy.makeMove(m);
+            return AlphaBeta(copy,m,player,player*-1,0,depthMax,Integer.MIN_VALUE,Integer.MAX_VALUE);
+        }).collect(Collectors.toList());
+        int indexOfMax=max.indexOf(max.stream().max(Double::compareTo).get());
+        List<Move> bestMoves=new LinkedList<>();
+        for (int i = 0; i <moves.size() ; i++) {
+            if (max.get(i)==max.get(indexOfMax))
+                bestMoves.add(moves.get(i));
         }
+        int rndIndex=new Random().nextInt(bestMoves.size());
+        return new Pair<>(bestMoves.get(rndIndex),max.get(indexOfMax));
     }
-
-    private  long getCurrentTime() {
-        return System.currentTimeMillis()-startingTime;
+    private static void shuffleWithProb(double prob,List<Move> moves){
+        if(Math.random()<prob)
+        Collections.shuffle(moves);
     }
-
-    private  Pair<Integer,Move> getMax (int player,int turn, Board board,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
-        Move indexOfBestMove=null;
-        List<Move> moves=board.getPossibleMoves(turn);
-        if(Math.random()>MIN_SHUFFLE) Collections.shuffle(moves);
-        for (Move theMove : moves) {
-
-            Board modifiedBoard = board.copy();
-            modifiedBoard.makeMove(theMove);
-            Pair<Integer,Move> min= alphaBetaPruning(player,board.otherPlayer(turn),theMove, modifiedBoard, alpha, beta, currentPly,maxPly,h);
-            int score=min.getKey();
-            if (score > alpha) {
-                alpha = score;
-                indexOfBestMove = theMove;
-            }
-
-            // Pruning.
-            if (alpha >= beta) {
-                break;
-            }
-        }
-
-
-        return new Pair((int) alpha,indexOfBestMove);
+    private static void limit(int n, List<Move>moves){
+        moves=moves.subList(0, Math.min(n,moves.size()));
     }
-
-
-    private  Pair<Integer,Move> getMin (int player,int turn, Board board ,double alpha, double beta, int currentPly,int maxPly,Heuristics h) {
-        Move indexOfBestMove = null;
-
-        List<Move>moves=board.getPossibleMoves(turn);
-        if(Math.random()>MAX_SHUFFLE) Collections.shuffle(moves);
-        for (Move theMove : moves) {
-
-            Board modifiedBoard = board.copy();
-            modifiedBoard.makeMove(theMove);
-
-            Pair<Integer,Move> max= alphaBetaPruning(player,board.otherPlayer(turn),theMove, modifiedBoard, alpha, beta, currentPly,maxPly,h);
-            int score=max.getKey();
-
-            if (score < beta) {
-                beta = score;
-                indexOfBestMove = theMove;
-            }
-
-            // Pruning.
-            if (alpha >= beta) {
-                break;
-            }
-        }
-
-
-        return new Pair((int) beta,indexOfBestMove);
+    private static long getCurrentTime() {
+        return System.currentTimeMillis() - startingTime;
     }
-
-
-
 }

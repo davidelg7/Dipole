@@ -1,5 +1,7 @@
 
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 public class Move implements Comparable<Move>{
@@ -10,6 +12,12 @@ public class Move implements Comparable<Move>{
     private int n;
     private int oldN;
     private int playerMover;
+
+    public static Move randomMove(Board b, int white) {
+        List<Move>m= b.getPossibleMoves(white);
+        Collections.shuffle(m);
+        return  m.get(0);
+    }
 
     public int getOldN() {
         return oldN;
@@ -103,8 +111,8 @@ public class Move implements Comparable<Move>{
         return fromI == move.fromI &&
                 fromJ == move.fromJ &&
                 toI == move.toI &&
-                toJ == move.toJ &&
-                n == move.n;}
+                toJ == move.toJ;
+    }
 
     @Override
     public int hashCode() {

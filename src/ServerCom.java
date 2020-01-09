@@ -5,14 +5,16 @@ import java.net.Socket;
 import java.util.*;
 
 public class ServerCom extends Thread{
-    private Board b= new Board();
+//    private Board b= new Board(new H3( new double[]{0.0, 3.0, 6.0, 7.0, 8.0, 9.0, 5.0, 4.0, 4.0, 1.5, 3.0, 3.0, 2.0},
+//            new double[]{0.0, 5.0, 4.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0},
+//            new double[]{0.0, 3.0, 6.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0}));
+    private Board b= new Board(new H3());
     private int player;
     private Socket s;
     private String address;
     private int port;
     private Scanner sc;
     private PrintWriter pw;
-    private Heuristics h=new H2();
     public ServerCom(String address, int port) throws IOException {
         this.player = player;
         this.s = new Socket(address,port);
@@ -57,25 +59,23 @@ public class ServerCom extends Thread{
         int i=1;
         TimerAlphaBeta tab= new TimerAlphaBeta();
         while (!s.isClosed()){
-            System.out.println("TURN"+i);
-            System.out.println(player);
+//            System.out.println("TURN"+i);
+//            System.out.println(player);
             String line=sc.nextLine();
-            System.out.println(line);
+//            System.out.println(line);
             String[] split=line.split(" ");
             if(split[0].contains("WELCOME")){
                 player=line.split(" ")[1].equals("White")? Board.WHITE:Board.BLACK;
             }
             if(split[0].contains("YOUR_TURN")){
 
-                Move m = tab.AlphaBetaAlg(b,player,player>0?new H3():new H3(),6);
-               // System.out.println(m);
+                Move m = tab.IterativeDeepeningAlphaBeta(b,player,3);
+
                 b.makeMove(m);
-                System.out.println(m);
-                System.out.println(new Message(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ()).message);
+
                 pw.println(new Message(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ()).message);
                 pw.flush();
 
-                System.out.println(b);
 
                 i++;
             }
@@ -86,13 +86,11 @@ public class ServerCom extends Thread{
                 tmp=list.get(list.indexOf(tmp));
                 b.makeMove(tmp);
                 i++;
-                System.out.println(b);
 
             }
             if(line.contains("ILLEGAL_MOVE")||line.contains("TIMEOUT")||line.contains("VICTORY")||line.contains("TIE")||line.contains("TIE")||line.contains("DEFEAT")) {
                 System.exit(0);
             }
-
 
 
 
@@ -111,10 +109,12 @@ public class ServerCom extends Thread{
     }
     public static void main(String...args) throws IOException {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         new ServerCom("localhost",8901).start();
+
     }
+
 }
