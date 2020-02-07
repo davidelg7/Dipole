@@ -5,8 +5,8 @@ public class TimerAlphaBeta {
 
     private static long startingTime;
     private static int msLimit = 900;
-    private static final double MIN_SHUFFLE = 0.0;
-    private static final double MAX_SHUFFLE = 0.0;
+    private static final double MIN_SHUFFLE = 0.3;
+    private static final double MAX_SHUFFLE = 0.3;
     private static final double CUT = 0;
     private static final int DIM = 12;
     private static boolean timeOut= false;

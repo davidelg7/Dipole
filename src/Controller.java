@@ -17,7 +17,7 @@ public class Controller {
     private GridPane grid;
     private AdvancedText[][] b1= new  AdvancedText[8][8];
     private AdvancedText pressed;
-    private Board b = new Board(new H3());
+    private Board b = new Board(new H_anto());
 //private Board b = new Board(new H2());
     private TimerAlphaBeta tab= new TimerAlphaBeta();
     @FXML
@@ -90,7 +90,7 @@ public class Controller {
             b.makeMove(m);
 
 
-
+//        System.out.println();
         updateBoard();
 
     }
