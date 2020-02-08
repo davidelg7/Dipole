@@ -72,7 +72,8 @@ public class Controller {
                 grid.add(t, j, i);
 
             }
-        Move m= TimerAlphaBeta.AutoDeepeningAlphaBeta(b,Board.WHITE);
+        Move m= tab.IterativeDeepeningAlphaBeta(b,Board.WHITE,3);//AutoDeepeningAlphaBeta(b,Board.WHITE);
+//        System.out.println("ANTOO");
         b.makeMove(m);
     updateBoard();
 

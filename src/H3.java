@@ -62,7 +62,7 @@ public class H3 extends Heuristics {
 ////                else
 ////                    if  (b.isPositionOfPlayer(i,j,b.otherPlayer(m.getPlayerMover())))
 ////                        sum-=sign*Math.pow(2,base[Math.abs(b.get(i,j))]);
-        System.out.println("H3");
+//        System.out.println("H3");
         switch (m.getType()){
             case CAPTURE:
                 sum+=sign*Math.pow(2,attack[m.getN()]);//-(distance(m.getPlayerMover(),b));

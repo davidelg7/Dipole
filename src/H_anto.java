@@ -1,4 +1,7 @@
+import java.util.Random;
+
 public class H_anto extends Heuristics {
+    double[] attack = new double[]{0.1, 8.0, 9.5, 13.0 , 12.5, 11.0, 8, 4.0, 4.9, 3.0, 3.1, 3.0, 2.1};
 
     private int getNumPedine(int player, Board b){
         return player==Board.WHITE?b.getWhiteNow():b.getBlackNow();
@@ -15,31 +18,49 @@ public class H_anto extends Heuristics {
         if (b.checkWinner()==b.otherPlayer(m.getPlayerMover())&&isMaximizer)return Double.NEGATIVE_INFINITY;
         if (b.checkWinner()==b.otherPlayer(m.getPlayerMover())&&!isMaximizer)return Double.POSITIVE_INFINITY;
         Board board_tmp = b.copy();
-        board_tmp.undoMove(m);
+        board_tmp.makeMove(m);
         int player = m.getPlayerMover();
         int numPedine = getNumPedine(player, b);
+//        System.out.println(Math.pow(Math.abs(numPedine),7)+" anto");
+        double sign=1.;
+        if (!isMaximizer)sign=-1.;
+        double sum = 0.0;
 
-        int sign=1;
-        if (!isMaximizer)sign=-1;
-        double sum = 0;
 //        System.out.println("H_anto "+numPedine);
         switch (m.getType()){
             case CAPTURE:
-                sum+= sign*( -Math.pow(Math.abs(numPedine),7) *
-                        (Math.abs(getNumPedineAvversario(player, board_tmp))-Math.abs(getNumPedineAvversario(player, b)))   );
+                sum= sign*(
+                        - Math.abs(numPedine)
+                        + (catchable(player,b)[0]*3) );//*(new Random().nextInt(2)) ) );
+
+
+//                        -Math.pow(Math.abs(numPedine),3)  *
+//                        (Math.abs(getNumPedineAvversario(player, board_tmp))-Math.abs(getNumPedineAvversario(player, b))) );
+
 //                System.out.println(Math.abs(getNumPedineAvversario(player, board_tmp))-Math.abs(getNumPedineAvversario(player, b))+" ANTO");
 
                 break;
             case MERGE:
-                sum+= sign*(  Math.abs(numPedine) + (-catchable(player ,b)[0]*(0.5*Math.abs(numPedine))) );//+ (catchable(player,b)[1]+(0.7*Math.abs(numPedine))));//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
+                sum= sign*(  Math.abs(numPedine)
+//                        +m.getN()*0.5
+//                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
+//                        - (catchable(player,board_tmp)[0]*3+1)
+                        - (catchable(player ,b)[0])*3);
+//                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
             case BASE:
                 //catchable: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
                 //          allora dagli un guadagno minore.
-                sum+= sign* ( Math.abs(numPedine) + (-catchable(player,b)[0]*(0.7*Math.abs(numPedine)))+(catchable(player,board_tmp)[0]*(0.7*Math.abs(numPedine)))  );// );//;+ (neighbors(player,b)+(0.7*Math.abs(numPedine))) + (catchable(player,b)[1]*(0.7*Math.abs(numPedine)))
+                sum= sign* ( Math.abs(numPedine) /*+ neighbors(player,b) */
+//                        +m.getN()*0.5
+//                        - (catchable(player,board_tmp)[0]*4+1)
+                        - (catchable(player,b)[0]*4) );
+//                        -(catchable(player,board_tmp)[0]*(0.7*Math.abs(numPedine)))
+//                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5) );//;+ (neighbors(player,b)+(0.7*Math.abs(numPedine)))
+//                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );
                 break;
             case DEL:
-                sum-= sign*( (Math.abs(getNumPedine(player,board_tmp)) - Math.abs(getNumPedine(player,b)))  );
+                sum= - sign*( (Math.abs(getNumPedine(player,board_tmp)) - Math.abs(getNumPedine(player,b)))  );
                 break;
             case STALL:
                 break;
@@ -48,13 +69,29 @@ public class H_anto extends Heuristics {
         return sum;
     }
 
+    private double numMoves(int fromI, int fromJ, int toI, int toJ) {
+        //mossa base in verticale (nord o sud)
+        if (fromJ == toJ) {
+            return Math.abs(fromI - toI);
+        }
+        //mossa capture in orizzontale
+        else if (fromI == toI) {
+            return Math.abs(fromJ - toJ);
+        }
+        //mossa in diagonale
+        else {
+            return Math.abs(fromI - toI);
+        }
+
+    }
+
     private int[] catchable(int player, Board b) {
         int[][] board = b.getBoard();
         int probablyDead = 0;
         int killer = 0;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
-                if (player == 1 && b.getBoard()[i][j] > 0) { //se sono il giocatore rosso e la cella ha una mia pedina
+                if (player == Board.WHITE && b.getBoard()[i][j] > 0) { //se sono il giocatore rosso e la cella ha una mia pedina
 //                    print(b);
                     for (int x = 0; x < board.length; x++) {
                         for (int y = 0; y < board.length; y++) {
@@ -66,9 +103,9 @@ public class H_anto extends Heuristics {
 //                                int distance = distanzaTraDuePunti(i,j,x,y).intValue();
                                 if ((distance >= Math.abs(b.getBoard()[i][j])) && (distance <= Math.abs(b.getBoard()[x][y])))
                                     probablyDead++;
-                                if ((distance < Math.abs(b.getBoard()[i][j])) && (distance >= Math.abs(b.getBoard()[x][y]))) {
+                                if ((distance <= Math.abs(b.getBoard()[i][j])) && (distance >= Math.abs(b.getBoard()[x][y])) && (Math.abs(b.getBoard()[x][y]) < Math.abs(b.getBoard()[i][j])) ){
                                     killer++;
-                                    System.out.println("killer");
+//                                    System.out.println("killer");
                                 }
 
 //                                    if (b.getBoard()[i][j] > probablyDead) probablyDead=b.getBoard()[i][j];
@@ -80,7 +117,7 @@ public class H_anto extends Heuristics {
                     }
                 }
 
-                if (player == -1 && b.getBoard()[i][j] < 0) {
+                if (player == Board.BLACK && b.getBoard()[i][j] < 0) {
 //                    print(b);
                     for (int x = 0; x < board.length; x++) {
                         for (int y = 0; y < board.length; y++) {
@@ -92,7 +129,7 @@ public class H_anto extends Heuristics {
 //                                int distance = distanzaTraDuePunti(i,j,x,y).intValue();
                                 if ((distance >= Math.abs(b.getBoard()[i][j])) && (distance <= Math.abs(b.getBoard()[x][y])))
                                    probablyDead++;
-                                if ((distance < Math.abs(b.getBoard()[i][j])) && (distance >= Math.abs(b.getBoard()[x][y]))) {
+                                if ((distance <= Math.abs(b.getBoard()[i][j])) && (distance >= Math.abs(b.getBoard()[x][y])) && (Math.abs(b.getBoard()[x][y]) < Math.abs(b.getBoard()[i][j])) ){
                                     killer++;
 //                                    System.out.println("killer");
                                 }

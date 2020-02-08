@@ -58,15 +58,16 @@ public class TimerAlphaBeta {
     }
     public static synchronized Move IterativeDeepeningAlphaBeta(Board b, int player, int depthMax){
         startingTime=System.currentTimeMillis();
-        Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,1);
+        Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,3);
 
-        for (int i = 2; i <=depthMax ; i++) {
-
-            Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
-            if (best.getValue()>m.getValue())break;
-            else
-                best=m;
-        }
+        //ANTONIO, HO TOLTO IO STO CODICE
+//        for (int i = 2; i <=depthMax ; i++) {
+//
+//            Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
+//            if (best.getValue()>m.getValue())break;
+//            else
+//                best=m;
+//        }
         System.out.println("Scelgo "+best);
         return best.getKey();
     }
