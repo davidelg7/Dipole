@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 public class TimerAlphaBeta {
 
     private static long startingTime;
-    private static int msLimit = 900;
+    private static int msLimit = 800;
     private static final double MIN_SHUFFLE = 0.3;
     private static final double MAX_SHUFFLE = 0.3;
     private static final double CUT = 0;
@@ -15,19 +15,16 @@ public class TimerAlphaBeta {
     public static double AlphaBeta(Board b,Move move, int maxPlayer, int currPlayer,int currDepth, int maxDepth, double alpha, double beta){
         if(getCurrentTime()>msLimit){
             timeOut=true;
-//            levels.get(currDepth).getLast().add(b.eval(move,maxPlayer,1));
             return b.eval(move,maxPlayer,1);
         }
         if (currDepth==maxDepth||b.checkWinner()!=0){
             timeOut=false;
-//            levels.get(currDepth).getLast().add(b.eval(move,maxPlayer,1));
             return b.eval(move,maxPlayer,1);}
         if(currPlayer==maxPlayer){
             double best=Double.NEGATIVE_INFINITY;
             List<Move> moves=b.getPossibleMoves(currPlayer);
             shuffleWithProb(MAX_SHUFFLE,moves);
             limit(DIM,moves);
-//            levels.get(currDepth+1).add(new LinkedList<>());
             for (Move m:moves){
                 Board copy= b.copy();copy.makeMove(m);
                 double val = AlphaBeta(copy,m,maxPlayer,currPlayer*-1,currDepth+1,maxDepth,alpha,beta);
@@ -35,7 +32,6 @@ public class TimerAlphaBeta {
                 alpha=Math.max(alpha,best);
                 if(alpha>=beta){break;}
             }
-//            levels.get(currDepth).getLast().add(best);
             return best;
         }
         else{
@@ -43,7 +39,6 @@ public class TimerAlphaBeta {
             List<Move> moves=b.getPossibleMoves(currPlayer);
             shuffleWithProb(MIN_SHUFFLE,moves);
             limit(DIM,moves);
-//            levels.get(currDepth+1).add(new LinkedList<>());
             for (Move m:moves){
                 Board copy= b.copy();copy.makeMove(m);
                 double val = AlphaBeta(copy,m,maxPlayer,currPlayer*-1,currDepth+1,maxDepth,alpha,beta);
@@ -52,23 +47,19 @@ public class TimerAlphaBeta {
                 if(alpha>=beta){break;}
 
             }
-//            levels.get(currDepth).getLast().add(best);
             return best;
         }
     }
     public static synchronized Move IterativeDeepeningAlphaBeta(Board b, int player, int depthMax){
         startingTime=System.currentTimeMillis();
-        Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,3);
-
-        //ANTONIO, HO TOLTO IO STO CODICE
-//        for (int i = 2; i <=depthMax ; i++) {
-//
-//            Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
-//            if (best.getValue()>m.getValue())break;
-//            else
-//                best=m;
-//        }
-        System.out.println("Scelgo "+best);
+        Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,1);
+        for (int i = 2; i <=depthMax ; i++) {
+            Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
+            if (best.getValue()>m.getValue())break;
+            else
+                best=m;
+        }
+        System.out.println("Scelgo "+best+" in "+getCurrentTime());
         return best.getKey();
     }
     public static   Move AutoDeepeningAlphaBeta(Board b,int player){
@@ -81,12 +72,10 @@ public class TimerAlphaBeta {
 //    private static void stampa(){
 //        levels.stream().forEach(l-> System.out.println(l));
 //    }
-    private static synchronized Pair<Move,Double> AlphaBetaAlg2(Board b, int player, int depthMax){
-//        levels= new LinkedList<>();
-//            levels.add(new LinkedList<>(Arrays.asList(new LinkedList<>())));
+    public static synchronized Pair<Move,Double> AlphaBetaAlg2(Board b, int player, int depthMax){
 
         List<Move> moves= b.getLimitedPossibleMoves(player,DIM);
-        List<Double>max=moves.stream().map(m->{
+        List<Double>max=moves.parallelStream().map(m->{
             Board copy= b.copy();
             copy.makeMove(m);
             return AlphaBeta(copy,m,player,player*-1,0,depthMax,Integer.MIN_VALUE,Integer.MAX_VALUE);

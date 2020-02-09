@@ -17,27 +17,20 @@ public class H_anto extends Heuristics {
 
         if (b.checkWinner()==b.otherPlayer(m.getPlayerMover())&&isMaximizer)return Double.NEGATIVE_INFINITY;
         if (b.checkWinner()==b.otherPlayer(m.getPlayerMover())&&!isMaximizer)return Double.POSITIVE_INFINITY;
-        Board board_tmp = b.copy();
-        board_tmp.makeMove(m);
+
         int player = m.getPlayerMover();
-        int numPedine = getNumPedine(player, b);
-//        System.out.println(Math.pow(Math.abs(numPedine),7)+" anto");
+        int numPedine = b.getPlayerNow(player);
         double sign=1.;
+
         if (!isMaximizer)sign=-1.;
+
         double sum = 0.0;
 
-//        System.out.println("H_anto "+numPedine);
         switch (m.getType()){
             case CAPTURE:
                 sum= sign*(
-                        - Math.abs(numPedine)
-                        + (catchable(player,b)[0]*3) );//*(new Random().nextInt(2)) ) );
-
-
-//                        -Math.pow(Math.abs(numPedine),3)  *
-//                        (Math.abs(getNumPedineAvversario(player, board_tmp))-Math.abs(getNumPedineAvversario(player, b))) );
-
-//                System.out.println(Math.abs(getNumPedineAvversario(player, board_tmp))-Math.abs(getNumPedineAvversario(player, b))+" ANTO");
+                        + Math.abs(numPedine)
+                        + (catchable(player,b)[0]*3) );
 
                 break;
             case MERGE:
@@ -60,7 +53,7 @@ public class H_anto extends Heuristics {
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );
                 break;
             case DEL:
-                sum= - sign*( (Math.abs(getNumPedine(player,board_tmp)) - Math.abs(getNumPedine(player,b)))  );
+                sum= - sign*( (Math.abs(getNumPedine(player,b)) - Math.abs(getNumPedine(player,b)))  );
                 break;
             case STALL:
                 break;
@@ -85,16 +78,24 @@ public class H_anto extends Heuristics {
 
     }
 
+    /**
+     *
+     * @param player
+     * @param b
+     * @return
+     */
     private int[] catchable(int player, Board b) {
         int[][] board = b.getBoard();
         int probablyDead = 0;
         int killer = 0;
+
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
-                if (player == Board.WHITE && b.getBoard()[i][j] > 0) { //se sono il giocatore rosso e la cella ha una mia pedina
-//                    print(b);
+
+                if (b.getBoard()[i][j] > 0) { //se sono il giocatore rosso e la cella ha una mia pedina
                     for (int x = 0; x < board.length; x++) {
                         for (int y = 0; y < board.length; y++) {
+
                             int distance = 0;
 
                             if (b.getBoard()[x][y] < 0) {

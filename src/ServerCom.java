@@ -8,7 +8,7 @@ public class ServerCom extends Thread{
 //    private Board b= new Board(new H3( new double[]{0.0, 3.0, 6.0, 7.0, 8.0, 9.0, 5.0, 4.0, 4.0, 1.5, 3.0, 3.0, 2.0},
 //            new double[]{0.0, 5.0, 4.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0},
 //            new double[]{0.0, 3.0, 6.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0}));
-    private Board b= new Board(new H3());
+    private Board b= new Board(new H4());
     private int player;
     private Socket s;
     private String address;
@@ -69,8 +69,7 @@ public class ServerCom extends Thread{
             }
             if(split[0].contains("YOUR_TURN")){
 
-                Move m = tab.IterativeDeepeningAlphaBeta(b,player,3);
-
+                Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,5);
                 b.makeMove(m);
 
                 pw.println(new Message(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ()).message);
@@ -107,13 +106,38 @@ public class ServerCom extends Thread{
 
 
     }
+
+    private static String getIp(List<String> args){
+        try{
+        for (int i=0;i<args.size();i++){
+            if(args.get(i).toLowerCase().equals("-ip"))
+                return args.get(i+1);
+        }
+        }catch (Exception e){}
+        return "localhost";
+
+    }
+    private static int getPort(List<String> args){
+        try{
+        for (int i=0;i<args.size();i++){
+            if(args.get(i).toLowerCase().equals("-port"))
+                return Integer.parseInt(args.get(i+1));
+        }
+    }catch (Exception e){}
+
+        return 8901;
+    }
+
+
     public static void main(String...args) throws IOException {
+
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        new ServerCom("localhost",8901).start();
+        System.out.println(getIp(Arrays.asList(args))+" "+getPort(Arrays.asList(args)));
+        new ServerCom(getIp(Arrays.asList(args)),getPort(Arrays.asList(args))).start();
 
     }
 
