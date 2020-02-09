@@ -87,7 +87,7 @@ public class Controller {
             b.makeMove(oppMove);
             updateBoard();
 
-            Move m = TimerAlphaBeta.AutoDeepeningAlphaBeta(b,Board.WHITE);
+            Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,Board.WHITE,4);
             b.makeMove(m);
 
 

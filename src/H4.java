@@ -32,7 +32,7 @@ public class H4 extends Heuristics {
                 sum+=sign*attack[m.getN()];
                 break;
             case MERGE:
-                sum+=sign*merge[m.getN()];
+                sum+=sign*merge[b.get(m.getToI(),m.getToJ())*m.getPlayerMover()];
                 break;
             case BASE:
                 //distance: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
