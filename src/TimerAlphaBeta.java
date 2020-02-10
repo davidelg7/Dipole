@@ -26,7 +26,8 @@ public class TimerAlphaBeta {
             shuffleWithProb(MAX_SHUFFLE,moves);
             limit(DIM,moves);
             for (Move m:moves){
-                Board copy= b.copy();copy.makeMove(m);
+                Board copy= b.copy();
+                copy.makeMove(m);
                 double val = AlphaBeta(copy,m,maxPlayer,currPlayer*-1,currDepth+1,maxDepth,alpha,beta);
                 best=Math.max(best,val);
                 alpha=Math.max(alpha,best);

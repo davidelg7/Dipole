@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Random;
 
-public class H_anto extends Heuristics {
+public class H_anto2 extends Heuristics {
     double[] attack = new double[]{0.1, 8.0, 9.5, 13.0 , 12.5, 11.0, 8, 4.0, 4.9, 3.0, 3.1, 3.0, 2.1};
 
     private int getNumPedine(int player, Board b){
@@ -30,8 +30,11 @@ public class H_anto extends Heuristics {
         switch (m.getType()){
             case CAPTURE:
                 sum= sign*(
-                        + Math.abs(numPedine)
-                                + (catchable(player,b)[0]*3) );
+                        + Math.abs(numPedine)*4
+                        + (totCatchable(b,player)*3)
+                        + (killer(b,player)*2)
+
+                );
 
                 break;
             case MERGE:
@@ -39,7 +42,10 @@ public class H_anto extends Heuristics {
 //                        +m.getN()*0.5
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
 //                        - (catchable(player,board_tmp)[0]*3+1)
-                        - (catchable(player ,b)[0])*3);
+                        - (totCatchable(b,player)*3)
+                        - (sidedsAndTopBottom(b,player)[0])
+                        + (killer(b,player))
+                        );
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
             case BASE:
@@ -48,7 +54,11 @@ public class H_anto extends Heuristics {
                 sum= sign* ( Math.abs(numPedine) /*+ neighbors(player,b) */
 //                        +m.getN()*0.5
 //                        - (catchable(player,board_tmp)[0]*4+1)
-                        - (catchable(player,b)[0]*4) );
+                        - (totCatchable(b,player)*4)
+                        - (sidedsAndTopBottom(b,player)[0])
+                        + (killer(b,player))
+                );
+
 //                        -(catchable(player,board_tmp)[0]*(0.7*Math.abs(numPedine)))
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5) );//;+ (neighbors(player,b)+(0.7*Math.abs(numPedine)))
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );
@@ -79,9 +89,22 @@ public class H_anto extends Heuristics {
 
     }
     private int totCatchable(Board b,int currPlayer){
+
         int adversary= b.otherPlayer(currPlayer);
+
         List<Move> capture=b.getAllOfType(adversary, Move.Type.CAPTURE);
+
         return capture.stream().mapToInt(m->m.getN()).sum();
+
+    }
+
+    private int killer(Board b,int currPlayer){
+
+        List<Move> capture=b.getAllOfType(currPlayer, Move.Type.CAPTURE);
+        try{
+        return capture.stream().max((m1,m2)->m1.getN()-m2.getN()).get().getN();}
+        catch (Exception e){}
+        return 0;
     }
 
     /**
@@ -134,12 +157,12 @@ public class H_anto extends Heuristics {
                                 else distance = Math.abs(i - x);
 //                                int distance = distanzaTraDuePunti(i,j,x,y).intValue();
                                 if ((distance >= Math.abs(b.getBoard()[i][j])) && (distance <= Math.abs(b.getBoard()[x][y])))
-                                   probablyDead++;
+                                    probablyDead++;
                                 if ((distance <= Math.abs(b.getBoard()[i][j])) && (distance >= Math.abs(b.getBoard()[x][y])) && (Math.abs(b.getBoard()[x][y]) < Math.abs(b.getBoard()[i][j])) ){
                                     killer++;
 //                                    System.out.println("killer");
                                 }
-                                    //                                   if (b.getBoard()[i][j] > probablyDead) probablyDead=b.getBoard()[i][j];
+                                //                                   if (b.getBoard()[i][j] > probablyDead) probablyDead=b.getBoard()[i][j];
 
                             }
 //                            System.out.println(b.getBoard()[x][y]+" prova "+i+","+j+"->"+x+","+y+" ---- "+probablyDead);
@@ -155,6 +178,32 @@ public class H_anto extends Heuristics {
 //        return probablyDead>3?1.5:0.8;
     }
 
+    private int[] sidedsAndTopBottom(Board b, int player){
+        int lati=0;
+        for (int i = 0; i <8 ; i++)
+                if (b.isPositionOfPlayer(i,0,player))
+                    lati+=Math.abs(b.get(i,0));
+        for (int i = 0; i <8 ; i++)
+            if (b.isPositionOfPlayer(i,7,player))
+                lati+=Math.abs(b.get(i,7));
+
+
+        int topBottom=0;
+
+        //SCONSIGLIABILE PER IL BIANCO
+        if(player==Board.WHITE)
+            for (int j = 0; j < 8; j++) {
+                if (b.isPositionOfPlayer(0, j, player))
+                    topBottom += Math.abs(b.get(0, j));
+            }
+        else
+            //RIGA SCONSIGLIABILE PER IL NERO
+                    for (int j = 0; j < 8; j++) {
+                        if (b.isPositionOfPlayer(7, j, player))
+                            topBottom+= Math.abs(b.get(7, j));
+                    }
+       return new int[]{lati,topBottom};
+    }
     private int neighbors(int player, Board b){
         int[][] board = b.getBoard();
         for (int i=0; i < board.length; i++){

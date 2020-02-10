@@ -105,7 +105,6 @@ public class Board {
     }
     public synchronized List<Move> getPossibleMoves(int player){
 
-//        if (!updated){return lastPossiblesMoves;}
 
         List<Move>moves= new LinkedList<>();
         List<Future<List<Move>>> futures=new LinkedList<>();

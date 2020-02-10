@@ -24,7 +24,7 @@ public class H4 extends Heuristics {
         List<Move> dangerous= dangerousMovesInNextTurn(b,m.getPlayerMover(),m);
 
         for (Move danger: dangerous)
-            sum-=sign*attack[danger.getN()];
+            sum-=sign*Math.pow(2,attacked[danger.getN()]);
 
 
         switch (m.getType()){
@@ -38,10 +38,10 @@ public class H4 extends Heuristics {
                 //distance: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
                 //          allora dagli un guadagno minore.
 
-                sum+=sign*2*base[b.get(m.getToI(),m.getToJ())*m.getPlayerMover()];
+                sum+=sign*base[b.get(m.getToI(),m.getToJ())*m.getPlayerMover()];
                 break;
             case DEL:
-                sum-=sign*attacked[m.getN()];//+distance(m.getPlayerMover(),b);
+                sum-=sign*attacked[m.getN()];
                 break;
             case STALL:
                 break;

@@ -8,7 +8,7 @@ public class ServerCom extends Thread{
 //    private Board b= new Board(new H3( new double[]{0.0, 3.0, 6.0, 7.0, 8.0, 9.0, 5.0, 4.0, 4.0, 1.5, 3.0, 3.0, 2.0},
 //            new double[]{0.0, 5.0, 4.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0},
 //            new double[]{0.0, 3.0, 6.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0}));
-    private Board b= new Board(new H4());
+    private Board b;
     private int player;
     private Socket s;
     private String address;
@@ -66,10 +66,15 @@ public class ServerCom extends Thread{
             String[] split=line.split(" ");
             if(split[0].contains("WELCOME")){
                 player=line.split(" ")[1].equals("White")? Board.WHITE:Board.BLACK;
+                if(player==Board.BLACK)
+                    b= new Board(new H_anto2());
+                else
+                    b= new Board(new H_anto());
             }
+
             if(split[0].contains("YOUR_TURN")){
 
-                Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,player==Board.WHITE?3:4);
+                Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,3);
                 b.makeMove(m);
 
                 pw.println(new Message(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ()).message);
