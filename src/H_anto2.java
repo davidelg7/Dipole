@@ -31,8 +31,8 @@ public class H_anto2 extends Heuristics {
             case CAPTURE:
                 sum= sign*(
                         + Math.abs(numPedine)*4
-                        + (totCatchable(b,player)*3)
-                        + (killer(b,player)*2)
+                        - (totCatchable(b,player))
+                        + (killer(b,player))
 
                 );
 
@@ -42,7 +42,8 @@ public class H_anto2 extends Heuristics {
 //                        +m.getN()*0.5
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
 //                        - (catchable(player,board_tmp)[0]*3+1)
-                        - (totCatchable(b,player)*3)
+                          - (totCatchable(b,player))*1.5
+
                         - (sidedsAndTopBottom(b,player)[0])
                         + (killer(b,player))
                         );
@@ -54,7 +55,7 @@ public class H_anto2 extends Heuristics {
                 sum= sign* ( Math.abs(numPedine) /*+ neighbors(player,b) */
 //                        +m.getN()*0.5
 //                        - (catchable(player,board_tmp)[0]*4+1)
-                        - (totCatchable(b,player)*4)
+                        - (totCatchable(b,player)*2)
                         - (sidedsAndTopBottom(b,player)[0])
                         + (killer(b,player))
                 );

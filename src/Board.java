@@ -70,28 +70,10 @@ public class Board {
         System.out.println("TEST GENERA MOSSE");
         Board b= new Board(new H3());
 
-        System.out.println(b);
         List<Move>moves= b.getPossibleMoves(b.BLACK);
-        List<Move.Type> quali=new LinkedList<>(Arrays.asList(Move.Type.DEL));
-        for (Move m:moves){
-            //if (!quali.contains(m.getType()))continue;
-            b.makeMove(m);
-            System.out.println(m);
-            System.out.println(b);
-            b.undoMove(m);
-            System.out.println(b);
 
-            System.out.println("-------------------------");
-        }
-       /* moves= b.getPossibleMoves(b.BLACK);
-        for (Move m:moves){
-            b.makeMove(m);
-            System.out.println(m);
-            System.out.println(b);
-            System.out.println("-------------------------");
-            b.undoMove(m);
-        }*/
         System.out.println(moves.size());
+        System.out.println(moves);
     }
     public List<Move> getSampleForEach(int player){
         List<Move> moves= getPossibleMoves(player);
@@ -108,24 +90,29 @@ public class Board {
 
         List<Move>moves= new LinkedList<>();
         List<Future<List<Move>>> futures=new LinkedList<>();
-        ExecutorService es = Executors.newFixedThreadPool(N_THREADS);
-        for (int i=0;i<8;i++){
-            for (int j=0;j<8;j++){
-                Future<List<Move>> futureTask=es.submit(getMoves(board,i,j,player));
-                futures.add(futureTask);
-                }
-            }
-        for (Future<List<Move>> f:futures){
-            try {
-                moves.addAll(f.get());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
 
-            es.shutdown();
+        for (int i=0;i<8;i++)
+            for (int j=0;j<8;j++)
+                moves.addAll(allMoves(board,i,j,player));
+
+//        ExecutorService es = Executors.newFixedThreadPool(N_THREADS);
+//        for (int i=0;i<8;i++){
+//            for (int j=0;j<8;j++){
+//                Future<List<Move>> futureTask=es.submit(getMoves(board,i,j,player));
+//                futures.add(futureTask);
+//                }
+//            }
+//        for (Future<List<Move>> f:futures){
+//            try {
+//                moves.addAll(f.get());
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            } catch (ExecutionException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//            es.shutdown();
 
         if(moves.isEmpty()){
             int i=0;
@@ -143,250 +130,254 @@ public class Board {
         updated=false;
         invocation++;
         meanWidth+=moves.size();
+//        System.out.println(moves);
         return moves;
 
     }
     public void setBoard(int i, int j,int player,int b){
         board[i][j]=b*player;
     }
+    private List<Move> allMoves(int[][] board,int i , int j, int player){
+        List<Move> moves= new LinkedList<>();
+        //se la cella appartiene al giocatore considerato
+        //considero il giocatore bianco
+        if(player==WHITE&&isPositionOfPlayer(i,j,WHITE)) {
+            int riga = i, colonna = j;
+            //genero le mosse in verticale
+
+            //k rappresenta il numero di celle di cui mi sposto
+            //fin tanto che mi sposto al massimo del numero di celle che ho, e non vado fuori dalla Board
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga - k >= 0; k += 2)
+            {
+                if (isPositionOfPlayer(riga - k, colonna, WHITE))
+                    moves.add(new Move(riga, colonna, riga - k, colonna, k, WHITE, Move.Type.MERGE));
+                else
+                if(k>=Math.abs(board[riga-k][colonna]))
+                    if (isPositionOfPlayer(riga - k, colonna, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga - k][colonna]))
+                        moves.add(new Move(riga, colonna, riga - k, colonna, k, WHITE, Move.Type.CAPTURE));
+                    else if (board[riga - k][colonna] == 0)
+                        moves.add(new Move(riga, colonna, riga - k, colonna, k, WHITE, Move.Type.BASE));
+            }
+            //genero le mosse capture a destra per il bianco
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna + k < 8; k += 2)
+                if (isPositionOfPlayer(riga, colonna + k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga][colonna + k]) && k >= Math.abs(board[riga][colonna + k]))
+                    moves.add(new Move(riga, colonna, riga, colonna + k, k, WHITE, Move.Type.CAPTURE));
+
+            //genero le mosse capture a sinistra per il bianco
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna - k >= 0; k += 2)
+                if (isPositionOfPlayer(riga, colonna - k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga][colonna - k]) && k >= Math.abs(board[riga][colonna - k]))
+                    moves.add(new Move(riga, colonna, riga, colonna - k, k, WHITE, Move.Type.CAPTURE));
+
+
+            //genero le mosse sulla diagonale principale per il bianco
+            for (int k = 1; k <= Math.abs(board[riga][colonna]) && riga - k >= 0 && colonna - k >= 0; k++)
+                if (isPositionOfPlayer(riga - k, colonna - k, WHITE))
+                    moves.add(new Move(riga, colonna, riga - k, colonna - k, k, WHITE, Move.Type.MERGE));
+                else
+                if(k>=Math.abs(board[riga-k][colonna-k]))
+
+                    if (isPositionOfPlayer(riga - k, colonna - k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga - k][colonna - k]))
+                        moves.add(new Move(riga, colonna, riga - k, colonna - k, k, WHITE, Move.Type.CAPTURE));
+                    else if (board[riga - k][colonna - k] == 0)
+
+                        moves.add(new Move(riga, colonna, riga - k, colonna - k, k, WHITE, Move.Type.BASE));
+
+            //genero le mosse sulla diagonale secondaria per il bianco
+            for(int k=1;k<=Math.abs(board[riga][colonna])&&riga-k>=0&&colonna+k<8;k++)
+            {
+                if (isPositionOfPlayer(riga - k, colonna + k, WHITE))
+                    moves.add(new Move(riga, colonna, riga - k, colonna + k, k, WHITE, Move.Type.MERGE));
+
+                else
+                if(k>=Math.abs(board[riga-k][colonna+k]))
+                    if (isPositionOfPlayer(riga - k, colonna + k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga - k][colonna + k]))
+                        moves.add(new Move(riga, colonna, riga - k, colonna + k, k, WHITE, Move.Type.CAPTURE));
+                    else if (board[riga - k][colonna + k] == 0)
+
+                        moves.add(new Move(riga, colonna, riga - k, colonna + k, k, WHITE, Move.Type.BASE));
+            }
+            //genero le mosse CAPTURE all'indietro per il bianco
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga +k<8; k += 2)
+                if(k>=Math.abs(board[riga+k][colonna]))
+                    //se la cella generata contiene una pedina avversaria di dimensione minore o uguale alla mia, aggiungo la possibile mossa CAPTURE
+                    if (isPositionOfPlayer(riga+k,colonna,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna]))
+                        moves.add(new Move(riga, colonna, riga + k, colonna, k,WHITE , Move.Type.CAPTURE));
+
+            //genero le mosse CAPTURE all'indietro sulla diagonale secondaria per il bianco
+            for(int k=1;k<=Math.abs(board[riga][colonna])&&riga+k<8&&colonna-k>=0;k++)
+                if(k>=Math.abs(board[riga+k][colonna-k]))
+                    if (isPositionOfPlayer(riga+k,colonna-k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna-k]))
+                        moves.add(new Move(riga,colonna,riga+k,colonna-k,k,WHITE , Move.Type.CAPTURE));
+
+            //genero le mosse CAPTURE all'indietro sulla diagonale principale per il bianco
+            for(int k=1;k<=Math.abs(board[riga][colonna])&&riga+k<8&&colonna+k<8;k++)
+                if(k>=Math.abs(board[riga+k][colonna+k]))
+                    if (isPositionOfPlayer(riga+k,colonna+k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna+k]))
+                        moves.add(new Move(riga,colonna,riga+k,colonna+k,k,WHITE , Move.Type.CAPTURE));
+            boolean v=false,D=false,d=false;
+            int minOut=Integer.MAX_VALUE;
+            int k=0;
+            //controllo in verticale quanto possa uscire
+            for (; k <= Math.abs(board[riga][colonna]) && riga - k >= 0; k += 1)
+                continue;
+            if(k>0)k--;
+            if (minOut==Math.min(k,minOut))v=true;
+            minOut=Math.min(k,minOut);
+
+            //controllo sulla diagonale secondaria quanto possa uscire
+
+            for (k=0; k <= Math.abs(board[riga][colonna]) && riga - k >=0&&colonna+k<8; k += 1)
+                continue;
+            if(k>0)k--;
+            if (minOut==Math.min(k,minOut))d=true;
+            minOut=Math.min(k,minOut);
+
+            //controllo sulla diagonale principale quanto possa uscire
+            for (k=0; k <= Math.abs(board[riga][colonna]) && riga - k >=0&&colonna-k>=0; k += 1)
+                continue;
+            if(k>0)k--;
+            if (minOut==Math.min(k,minOut))D=true;
+            minOut=Math.min(k,minOut);
+
+            //outV è il minimo numero di celle del percorso più vicino al bordo
+            //se non sono riuscito a muovere le pedine senza uscire dalla scacchiera significa che
+            //potenzialmente ho mosse che mi consentono di eliminarne
+            if(minOut!=board[i][j]){
+                // System.out.println("PUOI ELIMINARE da"+(minOut+1)+"a "+board[i][j]);
+                for(int out=minOut+1;out<=board[i][j];out++)
+                    if (v&&riga-out<0)
+                        moves.add(new Move(riga,colonna,riga-out,colonna,out,WHITE , Move.Type.DEL));
+                    else {
+                        if (d&&(riga-out<0||colonna+out>7))
+                            moves.add(new Move(riga, colonna, riga - out, colonna + out, out, WHITE, Move.Type.DEL));
+                        else if (D&&(riga-out<0||colonna-out<0))
+                            moves.add(new Move(riga, colonna, riga - out, colonna - out, out, WHITE, Move.Type.DEL));
+                    }}
+
+        }
+        else if(player==BLACK&&isPositionOfPlayer(i,j,BLACK)){
+            int riga = i, colonna = j;
+            //genero le mosse in verticale
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga + k <8; k += 2)
+            {
+                if (isPositionOfPlayer(riga + k, colonna, BLACK))
+                    moves.add(new Move(riga, colonna, riga + k, colonna, k, BLACK, Move.Type.MERGE));
+                else
+                if(k>=Math.abs(board[riga+k][colonna]))
+                    if (isPositionOfPlayer(riga + k, colonna, WHITE) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga + k][colonna]))
+                        moves.add(new Move(riga, j, riga + k, colonna, k, BLACK, Move.Type.CAPTURE));
+                    else if (board[riga + k][colonna] == 0)
+                        moves.add(new Move(riga, j, riga + k, colonna, k, BLACK, Move.Type.BASE));
+            }
+            //genero le mosse capture a destra per il nero
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna + k <8; k += 2)
+                if(isPositionOfPlayer(riga,colonna+k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna+k])&&k>=Math.abs(board[riga][colonna+k]))
+                    moves.add(new Move(riga, colonna, riga , colonna+k, k,BLACK , Move.Type.CAPTURE));
+
+            //genero le mosse capture a sinistra per il nero
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna - k >= 0; k += 2)
+                if(isPositionOfPlayer(riga,colonna-k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna-k])&&k>=Math.abs(board[riga][colonna-k]))
+                    moves.add(new Move(riga, colonna, riga , colonna-k, k,BLACK , Move.Type.CAPTURE));
+
+
+            //genero le mosse sulla diagonale principale per il nero
+            for(int k=1;k<=Math.abs(board[i][j])&&riga+k<8&&colonna+k<8;k++)
+            {
+                if (isPositionOfPlayer(riga + k, colonna + k, BLACK))
+                    moves.add(new Move(i, j, riga + k, colonna + k, k, BLACK, Move.Type.MERGE));
+                else
+                if(k>=Math.abs(board[riga+k][colonna+k]))
+                    if (isPositionOfPlayer(riga + k, colonna + k, WHITE) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga + k][colonna + k]))
+                        moves.add(new Move(i, j, riga + k, colonna + k, k, BLACK, Move.Type.CAPTURE));
+                    else if (board[riga + k][colonna + k] == 0)
+                        moves.add(new Move(i, j, riga + k, colonna + k, k, BLACK, Move.Type.BASE));
+            }
+            //genero le mosse sulla diagonale secondaria per il nero
+            for(int k=1;k<=Math.abs(board[i][j])&&riga+k<8&&colonna-k>=0;k++)
+            {
+
+                if (isPositionOfPlayer(riga + k, colonna - k, BLACK))
+                    moves.add(new Move(i, j, riga + k, colonna - k, k, BLACK, Move.Type.MERGE));
+                else
+                if(k>=Math.abs(board[riga+k][colonna-k]))
+                    if (isPositionOfPlayer(riga + k, colonna - k, WHITE) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga + k][colonna - k]))
+                        moves.add(new Move(i, j, riga + k, colonna - k, k, BLACK, Move.Type.CAPTURE));
+                    else if (board[riga + k][colonna - k] == 0)
+                        moves.add(new Move(i, j, riga + k, colonna - k, k, BLACK, Move.Type.BASE));
+            }
+            //genero le mosse CAPTURE all'indietro per il nero
+            for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga - k >=0; k += 2)
+                if(k>=Math.abs(board[riga-k][colonna]))
+                    //se la cella generata contiene una pedina avversaria di dimensione minore o uguale alla mia, aggiungo la possibile mossa CAPTURE
+                    if (isPositionOfPlayer(riga-k,colonna,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga-k][colonna]))
+                        moves.add(new Move(riga, colonna, riga - k, colonna, k,BLACK , Move.Type.CAPTURE));
+
+            //genero le mosse CAPTURE all'indietro sulla diagonale secondaria per il nero
+            for(int k=1;k<=Math.abs(board[riga][colonna])&&riga-k>=0&&colonna+k<8;k++)
+                if(k>=Math.abs(board[riga-k][colonna+k]))
+                    if (isPositionOfPlayer(riga-k,colonna+k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga-k][colonna+k]))
+                        moves.add(new Move(riga,colonna,riga-k,colonna+k,k,BLACK , Move.Type.CAPTURE));
+
+
+            //genero le mosse CAPTURE all'indietro sulla diagonale principale per il nero
+            for(int k=1;k<=Math.abs(board[riga][colonna])&&riga-k>=0&&colonna-k>=0;k++)
+                if(k>=Math.abs(board[riga-k][colonna-k]))
+                    if (isPositionOfPlayer(riga-k,colonna-k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga-k][colonna-k]))
+                        moves.add(new Move(riga,colonna,riga-k,colonna-k,k,BLACK , Move.Type.CAPTURE));
+
+
+            boolean v=false,D=false,d=false;
+            int minOut=Integer.MAX_VALUE;
+            int k=0;
+            //controllo in verticale quanto possa uscire
+            for (; k <= Math.abs(board[riga][colonna]) && riga + k <8; k += 2)
+                continue;
+            if(k>0)k--;
+            if (minOut==Math.min(k,minOut))v=true;
+            minOut=Math.min(k,minOut);
+
+            //controllo sulla diagonale secondaria quanto possa uscire
+
+            for (k=0; k <= Math.abs(board[riga][colonna]) && riga + k <8&&colonna-k>=0; k += 1)
+                continue;
+            if(k>0)k--;
+            if (minOut==Math.min(k,minOut))d=true;
+
+            minOut=Math.min(k,minOut);
+
+            //controllo sulla diagonale principale quanto possa uscire
+            for (k=0; k <= Math.abs(board[riga][colonna]) && riga + k <8&&colonna+k<8; k += 1)
+                continue;
+            if(k>0)k--;
+            if (minOut==Math.min(k,minOut))D=true;
+            minOut=Math.min(k,minOut);
+
+            //outV è il minimo numero di celle del percorso più vicino al bordo
+            //se non sono riuscito a muovere le pedine senza uscire dalla scacchiera significa che
+            //potenzialmente ho mosse che mi consentono di eliminarne
+            if(minOut!=board[i][j]) {
+                for (int out = minOut + 1; out <= Math.abs(board[i][j]); out++)
+                    if (D&&riga+out>=8||colonna+out>=8)
+                        moves.add(new Move(riga, colonna, riga + out, colonna + out, out, BLACK, Move.Type.DEL));
+                    else{
+
+                        if (d&&riga+out>=8||colonna-out<0 )
+                            moves.add(new Move(riga, colonna, riga + out, colonna - out, out, BLACK, Move.Type.DEL));
+
+                        else if (v&&riga+out>=8)
+                            moves.add(new Move(riga, colonna, riga + out, colonna, out, BLACK, Move.Type.DEL));
+                    }
+            }
+
+        }
+        return moves;
+    }
     private Callable<List<Move>> getMoves(int[][] board,int i,int j,int player){
         return new Callable<List<Move>>() {
             @Override
             public List<Move> call() throws Exception {
+                return allMoves(board,i,j,player);
 
-                List<Move> moves= new LinkedList<>();
-                //se la cella appartiene al giocatore considerato
-                //considero il giocatore bianco
-                if(player==WHITE&&isPositionOfPlayer(i,j,WHITE)) {
-                    int riga = i, colonna = j;
-                    //genero le mosse in verticale
-
-                    //k rappresenta il numero di celle di cui mi sposto
-                    //fin tanto che mi sposto al massimo del numero di celle che ho, e non vado fuori dalla Board
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga - k >= 0; k += 2)
-                         {
-                            if (isPositionOfPlayer(riga - k, colonna, WHITE))
-                                moves.add(new Move(riga, colonna, riga - k, colonna, k, WHITE, Move.Type.MERGE));
-                            else
-                            if(k>=Math.abs(board[riga-k][colonna]))
-                                if (isPositionOfPlayer(riga - k, colonna, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga - k][colonna]))
-                                moves.add(new Move(riga, colonna, riga - k, colonna, k, WHITE, Move.Type.CAPTURE));
-                            else if (board[riga - k][colonna] == 0)
-                                moves.add(new Move(riga, colonna, riga - k, colonna, k, WHITE, Move.Type.BASE));
-                        }
-                    //genero le mosse capture a destra per il bianco
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna + k < 8; k += 2)
-                        if (isPositionOfPlayer(riga, colonna + k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga][colonna + k]) && k >= Math.abs(board[riga][colonna + k]))
-                            moves.add(new Move(riga, colonna, riga, colonna + k, k, WHITE, Move.Type.CAPTURE));
-
-                    //genero le mosse capture a sinistra per il bianco
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna - k >= 0; k += 2)
-                        if (isPositionOfPlayer(riga, colonna - k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga][colonna - k]) && k >= Math.abs(board[riga][colonna - k]))
-                            moves.add(new Move(riga, colonna, riga, colonna - k, k, WHITE, Move.Type.CAPTURE));
-
-
-                    //genero le mosse sulla diagonale principale per il bianco
-                    for (int k = 1; k <= Math.abs(board[riga][colonna]) && riga - k >= 0 && colonna - k >= 0; k++)
-                        if (isPositionOfPlayer(riga - k, colonna - k, WHITE))
-                            moves.add(new Move(riga, colonna, riga - k, colonna - k, k, WHITE, Move.Type.MERGE));
-                        else
-                        if(k>=Math.abs(board[riga-k][colonna-k]))
-
-                            if (isPositionOfPlayer(riga - k, colonna - k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga - k][colonna - k]))
-                            moves.add(new Move(riga, colonna, riga - k, colonna - k, k, WHITE, Move.Type.CAPTURE));
-                        else if (board[riga - k][colonna - k] == 0)
-
-                            moves.add(new Move(riga, colonna, riga - k, colonna - k, k, WHITE, Move.Type.BASE));
-
-                    //genero le mosse sulla diagonale secondaria per il bianco
-                    for(int k=1;k<=Math.abs(board[riga][colonna])&&riga-k>=0&&colonna+k<8;k++)
-                         {
-                            if (isPositionOfPlayer(riga - k, colonna + k, WHITE))
-                                moves.add(new Move(riga, colonna, riga - k, colonna + k, k, WHITE, Move.Type.MERGE));
-
-                            else
-                            if(k>=Math.abs(board[riga-k][colonna+k]))
-                                if (isPositionOfPlayer(riga - k, colonna + k, BLACK) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga - k][colonna + k]))
-                                moves.add(new Move(riga, colonna, riga - k, colonna + k, k, WHITE, Move.Type.CAPTURE));
-                            else if (board[riga - k][colonna + k] == 0)
-
-                                moves.add(new Move(riga, colonna, riga - k, colonna + k, k, WHITE, Move.Type.BASE));
-                        }
-                    //genero le mosse CAPTURE all'indietro per il bianco
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga +k<8; k += 2)
-                        if(k>=Math.abs(board[riga+k][colonna]))
-                            //se la cella generata contiene una pedina avversaria di dimensione minore o uguale alla mia, aggiungo la possibile mossa CAPTURE
-                        if (isPositionOfPlayer(riga+k,colonna,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna]))
-                            moves.add(new Move(riga, colonna, riga + k, colonna, k,WHITE , Move.Type.CAPTURE));
-
-                    //genero le mosse CAPTURE all'indietro sulla diagonale secondaria per il bianco
-                    for(int k=1;k<=Math.abs(board[riga][colonna])&&riga+k<8&&colonna-k>=0;k++)
-                        if(k>=Math.abs(board[riga+k][colonna-k]))
-                            if (isPositionOfPlayer(riga+k,colonna-k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna-k]))
-                            moves.add(new Move(riga,colonna,riga+k,colonna-k,k,WHITE , Move.Type.CAPTURE));
-
-                    //genero le mosse CAPTURE all'indietro sulla diagonale principale per il bianco
-                    for(int k=1;k<=Math.abs(board[riga][colonna])&&riga+k<8&&colonna+k<8;k++)
-                        if(k>=Math.abs(board[riga+k][colonna+k]))
-                            if (isPositionOfPlayer(riga+k,colonna+k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna+k]))
-                            moves.add(new Move(riga,colonna,riga+k,colonna+k,k,WHITE , Move.Type.CAPTURE));
-                    boolean v=false,D=false,d=false;
-                    int minOut=Integer.MAX_VALUE;
-                    int k=0;
-                    //controllo in verticale quanto possa uscire
-                    for (; k <= Math.abs(board[riga][colonna]) && riga - k >= 0; k += 1)
-                        continue;
-                    if(k>0)k--;
-                    if (minOut==Math.min(k,minOut))v=true;
-                    minOut=Math.min(k,minOut);
-
-                    //controllo sulla diagonale secondaria quanto possa uscire
-
-                    for (k=0; k <= Math.abs(board[riga][colonna]) && riga - k >=0&&colonna+k<8; k += 1)
-                        continue;
-                    if(k>0)k--;
-                    if (minOut==Math.min(k,minOut))d=true;
-                    minOut=Math.min(k,minOut);
-
-                    //controllo sulla diagonale principale quanto possa uscire
-                    for (k=0; k <= Math.abs(board[riga][colonna]) && riga - k >=0&&colonna-k>=0; k += 1)
-                        continue;
-                    if(k>0)k--;
-                    if (minOut==Math.min(k,minOut))D=true;
-                    minOut=Math.min(k,minOut);
-
-                    //outV è il minimo numero di celle del percorso più vicino al bordo
-                    //se non sono riuscito a muovere le pedine senza uscire dalla scacchiera significa che
-                    //potenzialmente ho mosse che mi consentono di eliminarne
-                    if(minOut!=board[i][j]){
-                        // System.out.println("PUOI ELIMINARE da"+(minOut+1)+"a "+board[i][j]);
-                        for(int out=minOut+1;out<=board[i][j];out++)
-                            if (v&&riga-out<0)
-                                moves.add(new Move(riga,colonna,riga-out,colonna,out,WHITE , Move.Type.DEL));
-                            else {
-                                if (d&&(riga-out<0||colonna+out>7))
-                                    moves.add(new Move(riga, colonna, riga - out, colonna + out, out, WHITE, Move.Type.DEL));
-                                else if (D&&(riga-out<0||colonna-out<0))
-                                    moves.add(new Move(riga, colonna, riga - out, colonna - out, out, WHITE, Move.Type.DEL));
-                            }}
-
-                }
-                else if(player==BLACK&&isPositionOfPlayer(i,j,BLACK)){
-                    int riga = i, colonna = j;
-                    //genero le mosse in verticale
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga + k <8; k += 2)
-                         {
-                            if (isPositionOfPlayer(riga + k, colonna, BLACK))
-                                moves.add(new Move(riga, colonna, riga + k, colonna, k, BLACK, Move.Type.MERGE));
-                            else
-                            if(k>=Math.abs(board[riga+k][colonna]))
-                                if (isPositionOfPlayer(riga + k, colonna, WHITE) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga + k][colonna]))
-                                moves.add(new Move(riga, j, riga + k, colonna, k, BLACK, Move.Type.CAPTURE));
-                            else if (board[riga + k][colonna] == 0)
-                                moves.add(new Move(riga, j, riga + k, colonna, k, BLACK, Move.Type.BASE));
-                        }
-                    //genero le mosse capture a destra per il nero
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna + k <8; k += 2)
-                        if(isPositionOfPlayer(riga,colonna+k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna+k])&&k>=Math.abs(board[riga][colonna+k]))
-                            moves.add(new Move(riga, colonna, riga , colonna+k, k,BLACK , Move.Type.CAPTURE));
-
-                    //genero le mosse capture a sinistra per il nero
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && colonna - k >= 0; k += 2)
-                        if(isPositionOfPlayer(riga,colonna-k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga][colonna-k])&&k>=Math.abs(board[riga][colonna-k]))
-                            moves.add(new Move(riga, colonna, riga , colonna-k, k,BLACK , Move.Type.CAPTURE));
-
-
-                    //genero le mosse sulla diagonale principale per il nero
-                    for(int k=1;k<=Math.abs(board[i][j])&&riga+k<8&&colonna+k<8;k++)
-                         {
-                            if (isPositionOfPlayer(riga + k, colonna + k, BLACK))
-                                moves.add(new Move(i, j, riga + k, colonna + k, k, BLACK, Move.Type.MERGE));
-                            else
-                            if(k>=Math.abs(board[riga+k][colonna+k]))
-                                if (isPositionOfPlayer(riga + k, colonna + k, WHITE) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga + k][colonna + k]))
-                                moves.add(new Move(i, j, riga + k, colonna + k, k, BLACK, Move.Type.CAPTURE));
-                            else if (board[riga + k][colonna + k] == 0)
-                                moves.add(new Move(i, j, riga + k, colonna + k, k, BLACK, Move.Type.BASE));
-                        }
-                    //genero le mosse sulla diagonale secondaria per il nero
-                    for(int k=1;k<=Math.abs(board[i][j])&&riga+k<8&&colonna-k>=0;k++)
-                         {
-
-                            if (isPositionOfPlayer(riga + k, colonna - k, BLACK))
-                                moves.add(new Move(i, j, riga + k, colonna - k, k, BLACK, Move.Type.MERGE));
-                            else
-                            if(k>=Math.abs(board[riga+k][colonna-k]))
-                                if (isPositionOfPlayer(riga + k, colonna - k, WHITE) && Math.abs(board[riga][colonna]) >= Math.abs(board[riga + k][colonna - k]))
-                                moves.add(new Move(i, j, riga + k, colonna - k, k, BLACK, Move.Type.CAPTURE));
-                            else if (board[riga + k][colonna - k] == 0)
-                                moves.add(new Move(i, j, riga + k, colonna - k, k, BLACK, Move.Type.BASE));
-                        }
-                    //genero le mosse CAPTURE all'indietro per il nero
-                    for (int k = 2; k <= Math.abs(board[riga][colonna]) && riga - k >=0; k += 2)
-                        if(k>=Math.abs(board[riga-k][colonna]))
-                            //se la cella generata contiene una pedina avversaria di dimensione minore o uguale alla mia, aggiungo la possibile mossa CAPTURE
-                        if (isPositionOfPlayer(riga-k,colonna,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga-k][colonna]))
-                            moves.add(new Move(riga, colonna, riga - k, colonna, k,BLACK , Move.Type.CAPTURE));
-
-                    //genero le mosse CAPTURE all'indietro sulla diagonale secondaria per il nero
-                    for(int k=1;k<=Math.abs(board[riga][colonna])&&riga-k>=0&&colonna+k<8;k++)
-                        if(k>=Math.abs(board[riga-k][colonna+k]))
-                            if (isPositionOfPlayer(riga-k,colonna+k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga-k][colonna+k]))
-                            moves.add(new Move(riga,colonna,riga-k,colonna+k,k,BLACK , Move.Type.CAPTURE));
-
-
-                    //genero le mosse CAPTURE all'indietro sulla diagonale principale per il nero
-                    for(int k=1;k<=Math.abs(board[riga][colonna])&&riga-k>=0&&colonna-k>=0;k++)
-                        if(k>=Math.abs(board[riga-k][colonna-k]))
-                            if (isPositionOfPlayer(riga-k,colonna-k,WHITE)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga-k][colonna-k]))
-                            moves.add(new Move(riga,colonna,riga-k,colonna-k,k,BLACK , Move.Type.CAPTURE));
-
-
-                    boolean v=false,D=false,d=false;
-                    int minOut=Integer.MAX_VALUE;
-                    int k=0;
-                    //controllo in verticale quanto possa uscire
-                    for (; k <= Math.abs(board[riga][colonna]) && riga + k <8; k += 2)
-                        continue;
-                    if(k>0)k--;
-                    if (minOut==Math.min(k,minOut))v=true;
-                    minOut=Math.min(k,minOut);
-
-                    //controllo sulla diagonale secondaria quanto possa uscire
-
-                    for (k=0; k <= Math.abs(board[riga][colonna]) && riga + k <8&&colonna-k>=0; k += 1)
-                        continue;
-                    if(k>0)k--;
-                    if (minOut==Math.min(k,minOut))d=true;
-
-                    minOut=Math.min(k,minOut);
-
-                    //controllo sulla diagonale principale quanto possa uscire
-                    for (k=0; k <= Math.abs(board[riga][colonna]) && riga + k <8&&colonna+k<8; k += 1)
-                        continue;
-                    if(k>0)k--;
-                    if (minOut==Math.min(k,minOut))D=true;
-                    minOut=Math.min(k,minOut);
-
-                    //outV è il minimo numero di celle del percorso più vicino al bordo
-                    //se non sono riuscito a muovere le pedine senza uscire dalla scacchiera significa che
-                    //potenzialmente ho mosse che mi consentono di eliminarne
-                    if(minOut!=board[i][j]) {
-                        for (int out = minOut + 1; out <= Math.abs(board[i][j]); out++)
-                            if (D&&riga+out>=8||colonna+out>=8)
-                                moves.add(new Move(riga, colonna, riga + out, colonna + out, out, BLACK, Move.Type.DEL));
-                            else{
-
-                            if (d&&riga+out>=8||colonna-out<0 )
-                                moves.add(new Move(riga, colonna, riga + out, colonna - out, out, BLACK, Move.Type.DEL));
-
-                            else if (v&&riga+out>=8)
-                                moves.add(new Move(riga, colonna, riga + out, colonna, out, BLACK, Move.Type.DEL));
-                    }
-                    }
-
-                }
-                return moves;
             }
         };
     }

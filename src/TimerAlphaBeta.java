@@ -5,19 +5,21 @@ public class TimerAlphaBeta {
 
     private static long startingTime;
     private static int msLimit = 800;
-    private static final double MIN_SHUFFLE = 0.3;
-    private static final double MAX_SHUFFLE = 0.3;
+    private static final double MIN_SHUFFLE = 0.4;
+    private static final double MAX_SHUFFLE = 0.4;
     private static final double CUT = 0;
     private static final int DIM = 12;
     private static boolean timeOut= false;
     private static  int depth=3;
-//    private static LinkedList<LinkedList<List<Number>>> levels= new LinkedList<>();
+    private static int nFoglie=0;
     public static double AlphaBeta(Board b,Move move, int maxPlayer, int currPlayer,int currDepth, int maxDepth, double alpha, double beta){
         if(getCurrentTime()>msLimit){
+            nFoglie++;
             timeOut=true;
             return b.eval(move,maxPlayer,1);
         }
         if (currDepth==maxDepth||b.checkWinner()!=0){
+            nFoglie++;
             timeOut=false;
             return b.eval(move,maxPlayer,1);}
         if(currPlayer==maxPlayer){
@@ -55,12 +57,14 @@ public class TimerAlphaBeta {
         startingTime=System.currentTimeMillis();
         Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,1);
         for (int i = 2; i <=depthMax ; i++) {
+            nFoglie=0;
             Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
             if (best.getValue()>m.getValue())break;
             else
                 best=m;
         }
-        System.out.println("Scelgo "+best+" in "+getCurrentTime());
+//        System.out.println();
+//        System.out.println("Scelgo "+best+" in "+getCurrentTime());
         return best.getKey();
     }
     public static   Move AutoDeepeningAlphaBeta(Board b,int player){
@@ -79,7 +83,10 @@ public class TimerAlphaBeta {
         List<Double>max=moves.parallelStream().map(m->{
             Board copy= b.copy();
             copy.makeMove(m);
-            return AlphaBeta(copy,m,player,player*-1,0,depthMax,Integer.MIN_VALUE,Integer.MAX_VALUE);
+            nFoglie=0;
+            double d = AlphaBeta(copy,m,player,player*-1,0,depthMax,Integer.MIN_VALUE,Integer.MAX_VALUE);
+//            System.out.println(nFoglie);
+            return d;
         }).collect(Collectors.toList());
         int indexOfMax=max.indexOf(max.stream().max(Double::compareTo).get());
         List<Move> bestMoves=new LinkedList<>();

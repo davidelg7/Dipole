@@ -67,7 +67,7 @@ public class ServerCom2 extends Thread{
             }
             if(split[0].contains("YOUR_TURN")){
 
-                Move m = tab.IterativeDeepeningAlphaBeta(b,player,4);
+                Move m = tab.IterativeDeepeningAlphaBeta(b,player,7);
 
                 b.makeMove(m);
 
