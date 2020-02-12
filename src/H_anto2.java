@@ -30,9 +30,9 @@ public class H_anto2 extends Heuristics {
         switch (m.getType()){
             case CAPTURE:
                 sum = sign*(
-                         12
-                        - (totCatchable(b,player)*2)
-//                        + (killer(b,player))
+                         18
+                        - (totCatchable(b,player)*4)
+                        + (killer(b,player)*2)
                 );
 
                 break;
@@ -41,10 +41,10 @@ public class H_anto2 extends Heuristics {
 //                        +m.getN()
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
 //                        - (catchable(player,board_tmp)[0]*3+1)
-                          - (totCatchable(b,player)*3)
+                          - (totCatchable(b,player)*5)
 
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
-//                        + (killer(b,player)*3)
+                        + (killer(b,player)*3)
                         );
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
@@ -56,7 +56,9 @@ public class H_anto2 extends Heuristics {
 //                        - (catchable(player,board_tmp)[0]*4+1)
                         - (totCatchable(b,player)*4)
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
-//                        + (killer(b,player)*3)
+                        + (adversaryInFirstPositions(b, player)*2)
+                        + (neighbors(player, b)*totCatchable(b,player)*2)
+                        + (killer(b,player)*3)
 
 
                 );
@@ -73,6 +75,29 @@ public class H_anto2 extends Heuristics {
         }
 //        System.out.println("H_a");
         return sum;
+    }
+
+
+
+    private double adversaryInFirstPositions(Board b, int currPlayer){
+//        int adversary = b.otherPlayer(currPlayer);
+        int adversary = currPlayer==1?-1:1;
+        int[][] board = b.getBoard();
+
+        for(int i=3; i< 8; i++){
+            for(int j=0;j<8; j++){
+                if(adversary==Board.WHITE) {
+                    if (board[7 - i][j] > 0) {
+                        return 0.;
+                    }
+                }
+                else {
+                    if (board[i][j] < 0)
+                        return 0.;
+                }
+            }
+        }
+        return 1.;
     }
 
     private double numMoves(int fromI, int fromJ, int toI, int toJ) {
