@@ -67,7 +67,7 @@ public class ServerCom2 extends Thread{
             }
             if(split[0].contains("YOUR_TURN")){
 
-                Move m = tab.IterativeDeepeningAlphaBeta(b,player,7);
+                Move m = tab.IterativeDeepeningAlphaBeta(b,player,6);
 
                 b.makeMove(m);
 
@@ -134,6 +134,7 @@ public class ServerCom2 extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println(getIp(Arrays.asList(args))+" "+getPort(Arrays.asList(args)));
         new ServerCom2("localhost",8901).start();
 //        try {
 //            Thread.sleep(3000);

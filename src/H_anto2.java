@@ -21,16 +21,16 @@ public class H_anto2 extends Heuristics {
 
         int player = m.getPlayerMover();
         int numPedine = getNumPedine(player,b);
-        double sign=1.;
 
-        if (!isMaximizer)sign=-1.;
+        double sign=1.;
+//        if (!isMaximizer)sign=-1.;
 
         double sum = 0.0;
 
         switch (m.getType()){
             case CAPTURE:
                 sum = sign*(
-                         18
+                        18
                         - (totCatchable(b,player)*4)
                         + (killer(b,player)*2)
                 );
@@ -57,7 +57,7 @@ public class H_anto2 extends Heuristics {
                         - (totCatchable(b,player)*4)
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
                         + (adversaryInFirstPositions(b, player)*2)
-                        + (neighbors(player, b)*totCatchable(b,player)*2)
+//                        + (neighbors(player, b)*(1-totCatchable(b,player)))
                         + (killer(b,player)*3)
 
 
