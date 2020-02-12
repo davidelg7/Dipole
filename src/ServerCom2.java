@@ -6,7 +6,7 @@ import java.util.*;
 
 public class ServerCom2 extends Thread{
 
-    private Board b= new Board(new H_anto());
+    private Board b= new Board(new H_anto2());
     private int player;
     private Socket s;
     private String address;
@@ -105,6 +105,29 @@ public class ServerCom2 extends Thread{
 
 
     }
+
+
+    private static String getIp(List<String> args){
+        try{
+            for (int i=0;i<args.size();i++){
+                if(args.get(i).toLowerCase().equals("-ip"))
+                    return args.get(i+1);
+            }
+        }catch (Exception e){}
+        return "localhost";
+
+    }
+    private static int getPort(List<String> args){
+        try{
+            for (int i=0;i<args.size();i++){
+                if(args.get(i).toLowerCase().equals("-port"))
+                    return Integer.parseInt(args.get(i+1));
+            }
+        }catch (Exception e){}
+
+        return 8901;
+    }
+
     public static void main(String...args) throws IOException {
         try {
             Thread.sleep(3000);
@@ -112,7 +135,16 @@ public class ServerCom2 extends Thread{
             e.printStackTrace();
         }
         new ServerCom2("localhost",8901).start();
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        System.out.println(getIp(Arrays.asList(args))+" "+getPort(Arrays.asList(args)));
+//        new ServerCom2(getIp(Arrays.asList(args)),getPort(Arrays.asList(args))).start();
 
     }
 
-}
+    }
+
+

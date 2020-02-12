@@ -20,7 +20,7 @@ public class H_anto2 extends Heuristics {
         if (b.checkWinner()==b.otherPlayer(m.getPlayerMover())&&!isMaximizer)return Double.POSITIVE_INFINITY;
 
         int player = m.getPlayerMover();
-        int numPedine = getNumPedineAvversario(player,b);
+        int numPedine = getNumPedine(player,b);
         double sign=1.;
 
         if (!isMaximizer)sign=-1.;
@@ -29,35 +29,36 @@ public class H_anto2 extends Heuristics {
 
         switch (m.getType()){
             case CAPTURE:
-                sum= sign*(
-                        + Math.abs(numPedine)*4
-                        - (totCatchable(b,player))
-                        + (killer(b,player))
-
+                sum = sign*(
+                         12
+                        - (totCatchable(b,player)*2)
+//                        + (killer(b,player))
                 );
 
                 break;
             case MERGE:
-                sum= sign*(  Math.abs(numPedine)
-//                        +m.getN()*0.5
+                sum = sign*(  12
+//                        +m.getN()
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
 //                        - (catchable(player,board_tmp)[0]*3+1)
-                          - (totCatchable(b,player))*1.5
+                          - (totCatchable(b,player)*3)
 
-                        - (sidedsAndTopBottom(b,player)[0])
-                        + (killer(b,player))
+                        - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
+//                        + (killer(b,player)*3)
                         );
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
             case BASE:
                 //catchable: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
                 //          allora dagli un guadagno minore.
-                sum= sign* ( Math.abs(numPedine) /*+ neighbors(player,b) */
-//                        +m.getN()*0.5
+                sum = sign* (  12/*+ neighbors(player,b) */
+//                        + m.getN()
 //                        - (catchable(player,board_tmp)[0]*4+1)
-                        - (totCatchable(b,player)*2)
-                        - (sidedsAndTopBottom(b,player)[0])
-                        + (killer(b,player))
+                        - (totCatchable(b,player)*4)
+                        - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
+//                        + (killer(b,player)*3)
+
+
                 );
 
 //                        -(catchable(player,board_tmp)[0]*(0.7*Math.abs(numPedine)))
@@ -94,16 +95,17 @@ public class H_anto2 extends Heuristics {
         int adversary= b.otherPlayer(currPlayer);
 
         List<Move> capture=b.getAllOfType(adversary, Move.Type.CAPTURE);
-
-        return capture.stream().mapToInt(m->m.getN()).sum();
-
+//        return capture.stream().mapToInt(m->m.getN()).sum();
+        return capture.size()>0?1:0;
     }
 
     private int killer(Board b,int currPlayer){
 
         List<Move> capture=b.getAllOfType(currPlayer, Move.Type.CAPTURE);
-        try{
-        return capture.stream().max((m1,m2)->m1.getN()-m2.getN()).get().getN();}
+        try {
+//            return capture.stream().max((m1,m2)->m1.getN()-m2.getN()).get().getN();}
+            return capture.size() > 0 ? 1 : 0;
+        }
         catch (Exception e){}
         return 0;
     }
