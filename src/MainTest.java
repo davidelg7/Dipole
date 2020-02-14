@@ -8,7 +8,7 @@ public class MainTest {
 
     static int nGames=10 ;
 
-    static int DEPTH=4;
+    static int DEPTH=6;
 
     //=======================
     public static void main(String[] args) throws InterruptedException {
@@ -19,7 +19,7 @@ public class MainTest {
 
         Heuristics H1= new H_anto2();
 
-        Heuristics H2= new H3();
+        Heuristics H2= new H4();
 
         List<Integer> l= new LinkedList<>();
         for (int i = 0; i <nGames; i++)
