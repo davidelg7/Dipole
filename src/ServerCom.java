@@ -8,7 +8,7 @@ public class ServerCom extends Thread{
 //    private Board b= new Board(new H3( new double[]{0.0, 3.0, 6.0, 7.0, 8.0, 9.0, 5.0, 4.0, 4.0, 1.5, 3.0, 3.0, 2.0},
 //            new double[]{0.0, 5.0, 4.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0},
 //            new double[]{0.0, 3.0, 6.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0}));
-    private Board b = new Board(new H_anto2());;
+    private Board b = new Board(new H_anto());;
     private int player;
     private Socket s;
     private String address;
@@ -62,16 +62,15 @@ public class ServerCom extends Thread{
 //            System.out.println("TURN"+i);
 //            System.out.println(player);
             String line=sc.nextLine();
-//            System.out.println(line);
             String[] split=line.split(" ");
             if(split[0].contains("WELCOME")){
                 player=line.split(" ")[1].equals("White")? Board.WHITE:Board.BLACK;
-//                Heuristics h=null;
-//                if(player==Board.BLACK)
-//                    h=new H_anto2();
-//                else
-//                    h=new H_anto2();
-//                b=new Board(h);
+                Heuristics h=null;
+                if(player==Board.BLACK)
+                    h=new H_anto2();
+                else
+                    h=new H3();
+                b=new Board(h);
             }
 
             if(split[0].contains("YOUR_TURN")){

@@ -6,9 +6,9 @@ public class MainTest {
     //=======================
     //CONFIGURATION
 
-    static int nGames=20 ;
+    static int nGames=10 ;
 
-    static int DEPTH=3;
+    static int DEPTH=4;
 
     //=======================
     public static void main(String[] args) throws InterruptedException {
@@ -18,10 +18,8 @@ public class MainTest {
         AtomicInteger B= new AtomicInteger();
 
         Heuristics H1= new H_anto2();
-        String H1Name="H_anto2";
-        
-        Heuristics H2= new H_anto();
-        String H2Name="H_anto";
+
+        Heuristics H2= new H3();
 
         List<Integer> l= new LinkedList<>();
         for (int i = 0; i <nGames; i++)
@@ -29,14 +27,13 @@ public class MainTest {
         // ANDATA
         l.stream().forEach(i->{
             int winner = winner(H1, H2);
-
             if (winner == Board.WHITE) W.getAndIncrement();
             if (winner == Board.BLACK) B.getAndIncrement();
         });
-        String Winner=W.get() >B.get()?H1Name:W.get() <B.get()?H2Name:"EVEN";
+        String Winner=W.get() >B.get()?H1.toString().split("@")[0]:W.get() <B.get()?H2.toString().split("@")[0]:"EVEN";
         System.out.println("VINCITORE ANDATA : "+Winner+String.format(" %1.2f",Math.max(W.get(),B.get())/(nGames*.01))+"%");
-        System.out.println("WHITE: "+H1Name+" "+W);
-        System.out.println("BLACK: "+H2Name+" "+B);
+        System.out.println("WHITE: "+H1.toString().split("@")[0]+" "+W);
+        System.out.println("BLACK: "+H2.toString().split("@")[0]+" "+B);
         System.out.println("________________");
 
         AtomicInteger W2= new AtomicInteger();
@@ -53,10 +50,10 @@ public class MainTest {
             if (winner == Board.BLACK) B2.getAndIncrement();
         });
 
-        Winner=W2.get() >B2.get()?H2Name:W2.get() <B2.get()?H1Name:"EVEN";
+        Winner=W2.get() >B2.get()?H2.toString().split("@")[0]:W2.get() <B2.get()?H1.toString().split("@")[0]:"EVEN";
         System.out.println("VINCITORE RITORNO : "+Winner+String.format(" %1.2f",Math.max(W2.get(),B2.get())/(nGames*.01))+"%");
-        System.out.println("WHITE: "+H2Name+" "+W2);
-        System.out.println("BLACK: "+H1Name+" "+B2);
+        System.out.println("WHITE: "+H2.toString().split("@")[0]+" "+W2);
+        System.out.println("BLACK: "+H1.toString().split("@")[0]+" "+B2);
         System.out.println("________________");
     }
 

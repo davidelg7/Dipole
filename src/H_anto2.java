@@ -51,13 +51,13 @@ public class H_anto2 extends Heuristics {
             case BASE:
                 //catchable: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
                 //          allora dagli un guadagno minore.
-                sum = sign* (  12/*+ neighbors(player,b) */
+                sum = sign* (  13/*+ neighbors(player,b) */
 //                        + m.getN()
 //                        - (catchable(player,board_tmp)[0]*4+1)
                         - (totCatchable(b,player)*4)
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
                         + (adversaryInFirstPositions(b, player)*2)
-                        + (neighbors(player, b)*(1-totCatchable(b,player)))
+//                        + (neighbors(player, b)*(1-totCatchable(b,player)))
                         + (killer(b,player)*3)
 
 
