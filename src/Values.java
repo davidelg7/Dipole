@@ -66,7 +66,7 @@ public static void main(String...args){
     private static int play(Board b,TimerAlphaBeta tab,int player){
         int depth=2;
         while (b.checkWinner()==0) {
-            Move bestMove = TimerAlphaBeta.AutoDeepeningAlphaBeta(b, player);
+            Move bestMove = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b, player,4);
             b.makeMove(bestMove);
             player = b.otherPlayer(player);
             if (player==Board.WHITE)depth=2;

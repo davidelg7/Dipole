@@ -62,16 +62,15 @@ public class ServerCom extends Thread{
 //            System.out.println("TURN"+i);
 //            System.out.println(player);
             String line=sc.nextLine();
-//            System.out.println(line);
             String[] split=line.split(" ");
             if(split[0].contains("WELCOME")){
                 player=line.split(" ")[1].equals("White")? Board.WHITE:Board.BLACK;
-//                Heuristics h=null;
-//                if(player==Board.BLACK)
-//                    h=new H_anto2();
-//                else
-//                    h=new H_anto2();
-//                b=new Board(h);
+                Heuristics h=null;
+                if(player==Board.BLACK)
+                    h=new H_anto2();
+                else
+                    h=new H3();
+                b=new Board(h);
             }
 
             if(split[0].contains("YOUR_TURN")){

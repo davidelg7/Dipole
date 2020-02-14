@@ -37,7 +37,6 @@ public class MainAIvsHuman {
             winner = b.checkWinner();
         }
         System.out.println("WINNER IS "+(winner==Board.WHITE?"WHITE":"BLACK"));
-        Algorithms.stopEcecutorService();
 
 
 

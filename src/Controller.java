@@ -17,7 +17,7 @@ public class Controller {
     private GridPane grid;
     private AdvancedText[][] b1= new  AdvancedText[8][8];
     private AdvancedText pressed;
-    private Board b = new Board(new H_anto2());
+    private Board b = new Board(new H3());
     //private Board b = new Board(new H2());
     private TimerAlphaBeta tab= new TimerAlphaBeta();
     @FXML
@@ -72,7 +72,7 @@ public class Controller {
                 grid.add(t, j, i);
 
             }
-        Move m= tab.IterativeDeepeningAlphaBeta(b,Board.WHITE,3);//AutoDeepeningAlphaBeta(b,Board.WHITE);
+        Move m= tab.IterativeDeepeningAlphaBeta(b,Board.WHITE,6);//AutoDeepeningAlphaBeta(b,Board.WHITE);
 //        System.out.println("ANTOO");
         b.makeMove(m);
     updateBoard();
@@ -87,7 +87,7 @@ public class Controller {
             b.makeMove(oppMove);
             updateBoard();
 
-            Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,Board.WHITE,4);
+            Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,Board.WHITE,6);
             b.makeMove(m);
 
 
