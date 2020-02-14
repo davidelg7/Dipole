@@ -23,7 +23,7 @@ public class H_anto2 extends Heuristics {
         int numPedine = getNumPedine(player,b);
 
         double sign=1.;
-//        if (!isMaximizer)sign=-1.;
+        if (!isMaximizer)sign=-1.;
 
         double sum = 0.0;
 
@@ -57,7 +57,7 @@ public class H_anto2 extends Heuristics {
                         - (totCatchable(b,player)*4)
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
                         + (adversaryInFirstPositions(b, player)*2)
-//                        + (neighbors(player, b)*(1-totCatchable(b,player)))
+                        + (neighbors(player, b)*(1-totCatchable(b,player)))
                         + (killer(b,player)*3)
 
 

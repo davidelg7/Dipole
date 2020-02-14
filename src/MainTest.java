@@ -3,30 +3,40 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainTest {
+    //=======================
+    //CONFIGURATION
+
+    static int nGames=20 ;
+
+    static int DEPTH=3;
+
+    //=======================
     public static void main(String[] args) throws InterruptedException {
-        int nGames=100;
 
         AtomicInteger W= new AtomicInteger();
 
         AtomicInteger B= new AtomicInteger();
 
-        Heuristics H1= new H3();
-        Heuristics H2= new H_anto2();
+        Heuristics H1= new H_anto2();
+        String H1Name="H_anto2";
+        
+        Heuristics H2= new H_anto();
+        String H2Name="H_anto";
 
         List<Integer> l= new LinkedList<>();
         for (int i = 0; i <nGames; i++)
             l.add(i);
         // ANDATA
         l.stream().forEach(i->{
-
             int winner = winner(H1, H2);
 
             if (winner == Board.WHITE) W.getAndIncrement();
             if (winner == Board.BLACK) B.getAndIncrement();
         });
-        System.out.println("ANDATA :");
-        System.out.println("Vinte da H_WHITE "+W);
-        System.out.println("Vinte da H_BLACK "+B);
+        String Winner=W.get() >B.get()?H1Name:W.get() <B.get()?H2Name:"EVEN";
+        System.out.println("VINCITORE ANDATA : "+Winner+String.format(" %1.2f",Math.max(W.get(),B.get())/(nGames*.01))+"%");
+        System.out.println("WHITE: "+H1Name+" "+W);
+        System.out.println("BLACK: "+H2Name+" "+B);
         System.out.println("________________");
 
         AtomicInteger W2= new AtomicInteger();
@@ -35,20 +45,22 @@ public class MainTest {
 
         // >RITORNO
         l.stream().forEach(i->{
+
+
             int winner = winner(H2, H1);
 
             if (winner == Board.WHITE) W2.getAndIncrement();
             if (winner == Board.BLACK) B2.getAndIncrement();
         });
 
-        System.out.println("RITORNO :");
-        System.out.println("Vinte da H_WHITE "+W2);
-        System.out.println("Vinte da H_BLACK "+B2);
+        Winner=W2.get() >B2.get()?H2Name:W2.get() <B2.get()?H1Name:"EVEN";
+        System.out.println("VINCITORE RITORNO : "+Winner+String.format(" %1.2f",Math.max(W2.get(),B2.get())/(nGames*.01))+"%");
+        System.out.println("WHITE: "+H2Name+" "+W2);
+        System.out.println("BLACK: "+H1Name+" "+B2);
         System.out.println("________________");
     }
 
     private static int winner(Heuristics WHITE_H, Heuristics BLACK_H){
-        TimerAlphaBeta tab = new TimerAlphaBeta();
         Board b= new Board(null);
 
         int player=Board.WHITE;
@@ -56,11 +68,9 @@ public class MainTest {
         while (winner==0){
             Move bestMove=null;
             Heuristics turn=null;
-
             turn=   player==Board.WHITE?WHITE_H:BLACK_H;
             b.setH(turn);
-
-            bestMove=TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,5);
+            bestMove=TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,DEPTH);
             b.makeMove(bestMove);
             player=b.otherPlayer(player);
             winner=b.checkWinner();

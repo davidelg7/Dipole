@@ -64,7 +64,7 @@ public class TimerAlphaBeta {
 //                best=m;
 //        }
 //        System.out.println();
-        System.out.println("Scelgo "+best+" in "+getCurrentTime());
+//        System.out.println("Scelgo "+best+" in "+getCurrentTime());
         return best.getKey();
     }
     public static   Move AutoDeepeningAlphaBeta(Board b,int player){
