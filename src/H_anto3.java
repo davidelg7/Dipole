@@ -30,19 +30,19 @@ public class H_anto3 extends Heuristics {
         if(b.getWhiteNow()-b.getBlackNow()!=0)
             return sign*Math.pow(2,b.getPlayerNow(player))
 
-                       -Math.pow(1.9,b.getPlayerNow(otherPlayer));
+                    -Math.pow(2,b.getPlayerNow(otherPlayer));
 
         switch (m.getType()){
             case CAPTURE:
                 sum = sign*(
-                        18
+                        22
                                 - (totCatchable(b,player)*4)
                                 + (killer(b,player)*2)
                 );
 
                 break;
             case MERGE:
-                sum = sign*(  8
+                sum = sign*(  12
 //                        +m.getN()
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
 //                        - (catchable(player,board_tmp)[0]*3+1)
@@ -50,20 +50,22 @@ public class H_anto3 extends Heuristics {
 
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
                         + (killer(b,player)*4)
+//                        - (inLastPositions(b, player))
                 );
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
             case BASE:
                 //catchable: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
-                //          allora dagli un guadagno minore.
+                //           allora dagli un guadagno minore.
                 sum = sign* (  13/*+ neighbors(player,b) */
 //                        + m.getN()
 //                        - (catchable(player,board_tmp)[0]*4+1)
                         - (totCatchable(b,player)*4)
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
-                        + (adversaryInFirstPositions(b, player)*2)
+                        + (adversaryInFirstPositions(b, player)*(1-inLastPositions(b,player))*2)
 //                        + (neighbors(player, b)*(1-totCatchable(b,player)))
                         + (killer(b,player)*3)
+//                        - (inLastPositions(b, player))
 
 
                 );
@@ -73,7 +75,7 @@ public class H_anto3 extends Heuristics {
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );
                 break;
             case DEL:
-                sum= - sign*( (Math.abs(getNumPedine(player,b)) - Math.abs(getNumPedine(player,b)))  );
+                sum= - sign*( m.getN());
                 break;
             case STALL:
                 break;
@@ -82,7 +84,25 @@ public class H_anto3 extends Heuristics {
         return sum ;
     }
 
+    private double inLastPositions(Board b, int currPlayer){
 
+        int[][] board = b.getBoard();
+
+        for(int i=4; i< 8; i++){
+            for(int j=0;j<8; j++){
+                if(currPlayer==Board.WHITE) {
+                    if (board[7 - i][j] > 0) {
+                        return 1.;
+                    }
+                }
+                else {
+                    if (board[i][j] < 0)
+                        return 1.;
+                }
+            }
+        }
+        return 0.;
+    }
 
     private double adversaryInFirstPositions(Board b, int currPlayer){
 //        int adversary = b.otherPlayer(currPlayer);

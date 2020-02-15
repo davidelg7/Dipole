@@ -6,7 +6,7 @@ import java.util.*;
 
 public class ServerCom2 extends Thread{
 
-    private Board b= new Board(new H_anto2());
+    private Board b= new Board(new H_anto3());
     private int player;
     private Socket s;
     private String address;

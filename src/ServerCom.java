@@ -8,7 +8,7 @@ public class ServerCom extends Thread{
 //    private Board b= new Board(new H3( new double[]{0.0, 3.0, 6.0, 7.0, 8.0, 9.0, 5.0, 4.0, 4.0, 1.5, 3.0, 3.0, 2.0},
 //            new double[]{0.0, 5.0, 4.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0},
 //            new double[]{0.0, 3.0, 6.0, 7.0, 6.5, 6.0, 5.0, 4.0, 4.0}));
-    private Board b = new Board(new H4());;
+    private Board b =null;;
     private int player;
     private Socket s;
     private String address;

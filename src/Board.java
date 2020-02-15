@@ -69,8 +69,12 @@ public class Board {
     public static void main(String...args){
         System.out.println("TEST GENERA MOSSE");
         Board b= new Board(new H3());
-
-        List<Move>moves= b.getPossibleMoves(b.BLACK);
+        b.setBoard(0,3,BLACK,0);
+        b.setBoard(7,4,WHITE,0);
+        b.setBoard(0,1,BLACK,2);
+        b.setBoard(1,0,WHITE,1);
+        System.out.println(b);
+        List<Move>moves= b.getPossibleMoves(b.WHITE);
 
         System.out.println(moves.size());
         System.out.println(moves);
@@ -214,14 +218,19 @@ public class Board {
                 if(k>=Math.abs(board[riga+k][colonna+k]))
                     if (isPositionOfPlayer(riga+k,colonna+k,BLACK)&&Math.abs(board[riga][colonna])>=Math.abs(board[riga+k][colonna+k]))
                         moves.add(new Move(riga,colonna,riga+k,colonna+k,k,WHITE , Move.Type.CAPTURE));
+
             boolean v=false,D=false,d=false;
+
             int minOut=Integer.MAX_VALUE;
             int k=0;
             //controllo in verticale quanto possa uscire
             for (; k <= Math.abs(board[riga][colonna]) && riga - k >= 0; k += 1)
                 continue;
+            //In k ho il numero di celle di cui mi sono potuto spostare in avanti senza sfondare
             if(k>0)k--;
+            //Se ho sfondato la board allora mi segno v=true perchè ho sfondato in verticale
             if (minOut==Math.min(k,minOut))v=true;
+
             minOut=Math.min(k,minOut);
 
             //controllo sulla diagonale secondaria quanto possa uscire
@@ -248,9 +257,9 @@ public class Board {
                     if (v&&riga-out<0)
                         moves.add(new Move(riga,colonna,riga-out,colonna,out,WHITE , Move.Type.DEL));
                     else {
-                        if (d&&(riga-out<0||colonna+out>7))
+                        if (d&&(riga-out<=0||colonna+out>=7))
                             moves.add(new Move(riga, colonna, riga - out, colonna + out, out, WHITE, Move.Type.DEL));
-                        else if (D&&(riga-out<0||colonna-out<0))
+                        else if (D&&(riga-out<=0||colonna-out<=0))
                             moves.add(new Move(riga, colonna, riga - out, colonna - out, out, WHITE, Move.Type.DEL));
                     }}
 
@@ -361,7 +370,7 @@ public class Board {
                         moves.add(new Move(riga, colonna, riga + out, colonna + out, out, BLACK, Move.Type.DEL));
                     else{
 
-                        if (d&&riga+out>=8||colonna-out<0 )
+                        if (d&&riga+out>=8||colonna-out<=0 )
                             moves.add(new Move(riga, colonna, riga + out, colonna - out, out, BLACK, Move.Type.DEL));
 
                         else if (v&&riga+out>=8)

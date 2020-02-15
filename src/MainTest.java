@@ -5,10 +5,34 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MainTest {
     //=======================
     //CONFIGURATION
-    static int nGames=30 ;
+    static int nGames=10 ;
 
     static int DEPTH=4;
     //=======================
+    /*
+
+
+DEPTH=5; 800ms
+VINCITORE ANDATA : H_anto2 72,50%
+WHITE: H_anto2 29
+BLACK: H_anto3 11
+________________
+VINCITORE RITORNO : H_anto2 60,00%
+WHITE: H_anto3 16
+BLACK: H_anto2 24
+________________
+
+DEPTH=4 800 ms
+VINCITORE ANDATA : H_anto3 100,00%
+WHITE: H_anto2 0
+BLACK: H_anto3 40
+________________
+VINCITORE RITORNO : H_anto3 100,00%
+WHITE: H_anto3 40
+BLACK: H_anto2 0
+________________
+
+     */
 
     public static void main(String[] args) throws InterruptedException {
 

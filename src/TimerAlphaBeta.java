@@ -5,19 +5,15 @@ public class TimerAlphaBeta {
 
     private static long startingTime;
     private static int msLimit = 800;
-    private static final double MIN_SHUFFLE = 0.6;
-    private static final double MAX_SHUFFLE = 0.6;
-    private static final double CUT = 0;
+    private static final double MIN_SHUFFLE = 0.4;
+    private static final double MAX_SHUFFLE = 0.4;
     private static final int DIM =12;
-    private static boolean timeOut= false;
-    private static  int depth=3;
-    private static int nFoglie=0;
     public static double AlphaBeta(Board b,Move move, int maxPlayer, int currPlayer,int currDepth, int maxDepth, double alpha, double beta){
         if(getCurrentTime()>msLimit){
-            return b.eval(move,maxPlayer,1);
+            return b.eval(move,maxPlayer,currDepth);
         }
         if (currDepth==maxDepth||b.checkWinner()!=0){
-            return b.eval(move,maxPlayer,1);}
+            return b.eval(move,maxPlayer,currDepth);}
         if(currPlayer==maxPlayer){
             double best=Double.NEGATIVE_INFINITY;
             List<Move> moves=b.getPossibleMoves(currPlayer);
@@ -60,7 +56,7 @@ public class TimerAlphaBeta {
 //                best=m;
 //        }
 
-        System.out.println("Scelgo "+best+" in "+getCurrentTime());
+//        System.out.println("Scelgo "+best+" in "+getCurrentTime());
         return best.getKey();
     }
 
