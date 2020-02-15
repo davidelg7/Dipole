@@ -65,17 +65,17 @@ public class ServerCom extends Thread{
             String[] split=line.split(" ");
             if(split[0].contains("WELCOME")){
                 player=line.split(" ")[1].equals("White")? Board.WHITE:Board.BLACK;
-//                Heuristics h=null;
-//                if(player==Board.BLACK)
-//                    h=new H_anto2();
-//                else
-//                    h=new H3();
-//                b=new Board(h);
+                Heuristics h=null;
+                if(player==Board.BLACK)
+                    h=new H_anto2();
+                else
+                    h=new H_anto3();
+                b=new Board(h);
             }
 
             if(split[0].contains("YOUR_TURN")){
 
-                Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,6);
+                Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,4);
                 b.makeMove(m);
 
                 pw.println(new Message(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ()).message);

@@ -5,12 +5,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MainTest {
     //=======================
     //CONFIGURATION
-
-    static int nGames=10 ;
+    static int nGames=30 ;
 
     static int DEPTH=4;
-
     //=======================
+
     public static void main(String[] args) throws InterruptedException {
 
         AtomicInteger W= new AtomicInteger();
@@ -19,7 +18,7 @@ public class MainTest {
 
         Heuristics H1= new H_anto2();
 
-        Heuristics H2= new H4();
+        Heuristics H2= new H_anto3();
 
         List<Integer> l= new LinkedList<>();
         for (int i = 0; i <nGames; i++)
