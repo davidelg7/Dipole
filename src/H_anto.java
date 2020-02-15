@@ -65,7 +65,7 @@ public class H_anto extends Heuristics {
             case STALL:
                 break;
         }
-        System.out.println("H_a");
+//        System.out.println("H_a");
         return sum;
     }
 

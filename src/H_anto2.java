@@ -31,7 +31,7 @@ public class H_anto2 extends Heuristics {
             case CAPTURE:
                 sum = sign*(
                         18
-                        - (totCatchable(b,player)*4)
+                        - (totCatchable(b,player)*5)
                         + (killer(b,player)*2)
                 );
 
@@ -44,14 +44,14 @@ public class H_anto2 extends Heuristics {
                           - (totCatchable(b,player)*5)
 
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
-                        + (killer(b,player)*4)
+                        + (killer(b,player)*3)
                         );
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
             case BASE:
                 //catchable: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
                 //          allora dagli un guadagno minore.
-                sum = sign* (  13/*+ neighbors(player,b) */
+                sum = sign* (  12/*+ neighbors(player,b) */
 //                        + m.getN()
 //                        - (catchable(player,board_tmp)[0]*4+1)
                         - (totCatchable(b,player)*4)
@@ -74,7 +74,7 @@ public class H_anto2 extends Heuristics {
                 break;
         }
 //        System.out.println("H_anto2");
-        return sum ;
+        return sum;
     }
 
 
@@ -120,6 +120,7 @@ public class H_anto2 extends Heuristics {
         int adversary= b.otherPlayer(currPlayer);
 
         List<Move> capture=b.getAllOfType(adversary, Move.Type.CAPTURE);
+//        return capture.stream().mapToInt(m->m.getN()).sum();
         return capture.size()>0?1:0;
     }
 
