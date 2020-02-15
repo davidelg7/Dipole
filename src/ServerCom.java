@@ -69,13 +69,13 @@ public class ServerCom extends Thread{
                 if(player==Board.BLACK)
                     h=new H_anto2();
                 else
-                    h=new H3();
+                    h=new H_anto3();
                 b=new Board(h);
             }
 
             if(split[0].contains("YOUR_TURN")){
 
-                Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,6);
+                Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,player,4);
                 b.makeMove(m);
 
                 pw.println(new Message(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ()).message);

@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Random;
 
-public class H_anto2 extends Heuristics {
+public class H_anto3 extends Heuristics {
     double[] attack = new double[]{0.1, 8.0, 9.5, 13.0 , 12.5, 11.0, 8, 4.0, 4.9, 3.0, 3.1, 3.0, 2.1};
 
     private int getNumPedine(int player, Board b){
@@ -20,32 +20,37 @@ public class H_anto2 extends Heuristics {
         if (b.checkWinner()==b.otherPlayer(m.getPlayerMover())&&!isMaximizer)return Double.POSITIVE_INFINITY;
 
         int player = m.getPlayerMover();
+        int otherPlayer = b.otherPlayer(player);
         int numPedine = getNumPedine(player,b);
 
         double sign=1.;
         if (!isMaximizer)sign=-1.;
 
         double sum = 0.0;
+        if(b.getWhiteNow()-b.getBlackNow()!=0)
+            return sign*Math.pow(2,b.getPlayerNow(player))
+
+                       -Math.pow(1.9,b.getPlayerNow(otherPlayer));
 
         switch (m.getType()){
             case CAPTURE:
                 sum = sign*(
                         18
-                        - (totCatchable(b,player)*4)
-                        + (killer(b,player)*2)
+                                - (totCatchable(b,player)*4)
+                                + (killer(b,player)*2)
                 );
 
                 break;
             case MERGE:
-                sum = sign*(  12
+                sum = sign*(  8
 //                        +m.getN()
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
 //                        - (catchable(player,board_tmp)[0]*3+1)
-                          - (totCatchable(b,player)*5)
+                        - (totCatchable(b,player)*5)
 
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
                         + (killer(b,player)*4)
-                        );
+                );
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
             case BASE:
@@ -208,8 +213,8 @@ public class H_anto2 extends Heuristics {
     private int[] sidedsAndTopBottom(Board b, int player){
         int lati=0;
         for (int i = 0; i <8 ; i++)
-                if (b.isPositionOfPlayer(i,0,player))
-                    lati+=Math.abs(b.get(i,0));
+            if (b.isPositionOfPlayer(i,0,player))
+                lati+=Math.abs(b.get(i,0));
         for (int i = 0; i <8 ; i++)
             if (b.isPositionOfPlayer(i,7,player))
                 lati+=Math.abs(b.get(i,7));
@@ -225,11 +230,11 @@ public class H_anto2 extends Heuristics {
             }
         else
             //RIGA SCONSIGLIABILE PER IL NERO
-                    for (int j = 0; j < 8; j++) {
-                        if (b.isPositionOfPlayer(7, j, player))
-                            topBottom+= Math.abs(b.get(7, j));
-                    }
-       return new int[]{lati,topBottom};
+            for (int j = 0; j < 8; j++) {
+                if (b.isPositionOfPlayer(7, j, player))
+                    topBottom+= Math.abs(b.get(7, j));
+            }
+        return new int[]{lati,topBottom};
     }
     private int neighbors(int player, Board b){
         int[][] board = b.getBoard();

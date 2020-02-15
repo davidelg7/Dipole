@@ -51,14 +51,14 @@ public class TimerAlphaBeta {
     }
     public static synchronized Move IterativeDeepeningAlphaBeta(Board b, int player, int depthMax){
         startingTime=System.currentTimeMillis();
-        Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,1);
-        for (int i = 2; i <=depthMax ; i++) {
-            nFoglie=0;
-            Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
-            if (best.getValue()>m.getValue())break;
-            else
-                best=m;
-        }
+        Pair<Move,Double> best=AlphaBetaAlg2(b.copy(),player,depthMax);
+//        for (int i = 2; i <=depthMax ; i++) {
+//            nFoglie=0;
+//            Pair<Move,Double> m=AlphaBetaAlg2(b.copy(),player,i);
+//            if (best.getValue()>m.getValue())break;
+//            else
+//                best=m;
+//        }
 
 //        System.out.println("Scelgo "+best+" in "+getCurrentTime());
         return best.getKey();

@@ -17,8 +17,9 @@ public class Controller {
     private GridPane grid;
     private AdvancedText[][] b1= new  AdvancedText[8][8];
     private AdvancedText pressed;
-    private Board b = new Board(new H3());
-    //private Board b = new Board(new H2());
+    private Heuristics h= new H_anto3();
+    private int DEPTH=4;
+    private Board b = new Board(h);
     private TimerAlphaBeta tab= new TimerAlphaBeta();
     @FXML
     private VBox moves;
@@ -72,7 +73,7 @@ public class Controller {
                 grid.add(t, j, i);
 
             }
-        Move m= tab.IterativeDeepeningAlphaBeta(b,Board.WHITE,6);//AutoDeepeningAlphaBeta(b,Board.WHITE);
+        Move m= tab.IterativeDeepeningAlphaBeta(b,Board.WHITE,DEPTH);//AutoDeepeningAlphaBeta(b,Board.WHITE);
 //        System.out.println("ANTOO");
         b.makeMove(m);
     updateBoard();
@@ -87,7 +88,7 @@ public class Controller {
             b.makeMove(oppMove);
             updateBoard();
 
-            Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,Board.WHITE,6);
+            Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,Board.WHITE,DEPTH);
             b.makeMove(m);
 
 
@@ -98,8 +99,8 @@ public class Controller {
     private void runAlg(Move oppMove) {
         b.makeMove(oppMove);
         updateBoard();
-
-//        System.out.println("SCELGO " + new Pair<>(new H3().eval(b, m,1), m));
+        Move m = TimerAlphaBeta.IterativeDeepeningAlphaBeta(b,Board.WHITE,DEPTH);
+        b.makeMove(m);
         updateBoard();
 
     }
