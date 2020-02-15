@@ -8,7 +8,7 @@ public class MainTest {
 
     static int nGames=10 ;
 
-    static int DEPTH=6;
+    static int DEPTH=4;
 
     //=======================
     public static void main(String[] args) throws InterruptedException {

@@ -60,7 +60,7 @@ public class TimerAlphaBeta {
 //                best=m;
 //        }
 
-//        System.out.println("Scelgo "+best+" in "+getCurrentTime());
+        System.out.println("Scelgo "+best+" in "+getCurrentTime());
         return best.getKey();
     }
 

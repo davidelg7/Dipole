@@ -31,8 +31,8 @@ public class H_anto2 extends Heuristics {
             case CAPTURE:
                 sum = sign*(
                         18
-                        - (totCatchable(b,player)*5)
-                        + (killer(b,player)*2)
+                        - (totCatchable(b,player)*2)
+                        + (killer(b,player))
                 );
 
                 break;
@@ -41,24 +41,26 @@ public class H_anto2 extends Heuristics {
 //                        +m.getN()
 //                        - (numMoves(m.getFromI(),m.getFromJ(),m.getToI(),m.getToJ())/5 )
 //                        - (catchable(player,board_tmp)[0]*3+1)
-                          - (totCatchable(b,player)*5)
+                          - (totCatchable(b,player)*4)
 
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
-                        + (killer(b,player)*3)
+                        - (inLastPositions(b, player))
+//                        + (killer(b,player)*3)
                         );
 //                        - (catchable(player,b)[1]*(0.7*Math.abs(numPedine))) );//+ (catchable(player,board_tmp)*(0.7*Math.abs(numPedine)))    );
                 break;
             case BASE:
                 //catchable: se la mossa base implica lo spostamento della pedina su una posizione in cui verrà mangiata
                 //          allora dagli un guadagno minore.
-                sum = sign* (  12/*+ neighbors(player,b) */
+                sum = sign* (  13/*+ neighbors(player,b) */
 //                        + m.getN()
 //                        - (catchable(player,board_tmp)[0]*4+1)
-                        - (totCatchable(b,player)*4)
+                        - (totCatchable(b,player)*3)
                         - ((sidedsAndTopBottom(b,player)[0]>0?1:0)*2)
                         + (adversaryInFirstPositions(b, player)*2)
+                        - (inLastPositions(b, player))
 //                        + (neighbors(player, b)*(1-totCatchable(b,player)))
-                        + (killer(b,player)*3)
+//                        + (killer(b,player)*3)
 
 
                 );
@@ -77,7 +79,25 @@ public class H_anto2 extends Heuristics {
         return sum;
     }
 
+    private double inLastPositions(Board b, int currPlayer){
 
+        int[][] board = b.getBoard();
+
+        for(int i=4; i< 8; i++){
+            for(int j=0;j<8; j++){
+                if(currPlayer==Board.WHITE) {
+                    if (board[7 - i][j] > 0) {
+                        return 1.;
+                    }
+                }
+                else {
+                    if (board[i][j] < 0)
+                        return 1.;
+                }
+            }
+        }
+        return 0.;
+    }
 
     private double adversaryInFirstPositions(Board b, int currPlayer){
 //        int adversary = b.otherPlayer(currPlayer);
