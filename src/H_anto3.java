@@ -2,16 +2,13 @@ import java.util.List;
 import java.util.Random;
 
 public class H_anto3 extends Heuristics {
-    double[] attack = new double[]{0.1, 8.0, 9.5, 13.0 , 12.5, 11.0, 8, 4.0, 4.9, 3.0, 3.1, 3.0, 2.1};
 
     private int getNumPedine(int player, Board b){
         return player==Board.WHITE?b.getWhiteNow():b.getBlackNow();
     }
-    private int getNumPedineAvversario(int player, Board b){
-        return player==Board.WHITE?b.getBlackNow():b.getWhiteNow();
-    }
+
     @Override
-    double eval(Board b, Move m, int maximizer, int depth) {
+    double eval(Board b, Move m, int maximizer) {
         boolean isMaximizer=m.getPlayerMover()==maximizer;
         if(b.checkWinner()==m.getPlayerMover()&&isMaximizer)return Double.POSITIVE_INFINITY;
         if(b.checkWinner()==m.getPlayerMover()&&!isMaximizer) return Double.NEGATIVE_INFINITY;

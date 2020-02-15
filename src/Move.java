@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class Move implements Comparable<Move>{
+public class Move implements Comparable<Move> {
     private int fromI;
     private int fromJ;
     private int toI;
@@ -14,9 +14,9 @@ public class Move implements Comparable<Move>{
     private int playerMover;
 
     public static Move randomMove(Board b, int white) {
-        List<Move>m= b.getPossibleMoves(white);
+        List<Move> m = b.getPossibleMoves(white);
         Collections.shuffle(m);
-        return  m.get(0);
+        return m.get(0);
     }
 
     public int getOldN() {
@@ -27,28 +27,23 @@ public class Move implements Comparable<Move>{
         this.oldN = oldN;
     }
 
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    @Override
     public int compareTo(Move o) {
 
         return type.compareTo(o.type);
     }
 
-    public static enum Type{CAPTURE,MERGE,BASE,DEL,STALL}
+    public static enum Type {CAPTURE, MERGE, BASE, DEL, STALL}
 
-    private  Type type;
+    private Type type;
 
-    public Move(int fromI, int fromJ, int toI, int toJ, int n,int playerMover,Type type) {
+    public Move(int fromI, int fromJ, int toI, int toJ, int n, int playerMover, Type type) {
         this.fromI = fromI;
         this.fromJ = fromJ;
         this.toI = toI;
         this.toJ = toJ;
-        this.n=n;
-        this.type=type;
-        this.playerMover=playerMover;
+        this.n = n;
+        this.type = type;
+        this.playerMover = playerMover;
     }
 
     public int getPlayerMover() {

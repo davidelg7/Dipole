@@ -8,20 +8,12 @@ import java.util.stream.Collectors;
 public class Board {
 
     private int [][] board= new int[8][8];
-    private static int meanWidth=0;
-    private static int invocation=1;
+
     public static final int BLACK=-1;
     public static final int WHITE=1;
-    private boolean updated=true;
-    private int wBefore=12;
-    private int bBefore=12;
-    private List<Move>lastPossiblesMoves;
-    private static final int LARGHEZZA_MAX=15;
-    private int N_THREADS=1;
+
     private Heuristics h;
-    public static double getMeanWidth(){
-        return meanWidth/invocation;
-    }
+
     public int otherPlayer(int opt) {
         return opt==WHITE?BLACK:opt==BLACK?WHITE:0;
     }
@@ -66,57 +58,19 @@ public class Board {
 
         return Math.signum(board[i][j])==Math.signum(player);
     }
-    public static void main(String...args){
-        System.out.println("TEST GENERA MOSSE");
-        Board b= new Board(new H3());
-        b.setBoard(0,3,BLACK,0);
-        b.setBoard(7,4,WHITE,0);
-        b.setBoard(0,1,BLACK,2);
-        b.setBoard(1,0,WHITE,1);
-        System.out.println(b);
-        List<Move>moves= b.getPossibleMoves(b.WHITE);
 
-        System.out.println(moves.size());
-        System.out.println(moves);
-    }
-    public List<Move> getSampleForEach(int player){
-        List<Move> moves= getPossibleMoves(player);
-        return null;
-    }
     public List<Move> getAllOfType(int player,Move.Type type){
         return getPossibleMoves(player).stream().filter(f->f.getType().equals(type)).collect(Collectors.toList());
     }
-    public synchronized List<Move> getLimitedPossibleMoves(int player,int dim){
-        return getPossibleMoves(player).subList(0, Math.min(dim,lastPossiblesMoves.size()));
-    }
+
     public synchronized List<Move> getPossibleMoves(int player){
 
 
         List<Move>moves= new LinkedList<>();
-        List<Future<List<Move>>> futures=new LinkedList<>();
 
         for (int i=0;i<8;i++)
             for (int j=0;j<8;j++)
                 moves.addAll(allMoves(board,i,j,player));
-
-//        ExecutorService es = Executors.newFixedThreadPool(N_THREADS);
-//        for (int i=0;i<8;i++){
-//            for (int j=0;j<8;j++){
-//                Future<List<Move>> futureTask=es.submit(getMoves(board,i,j,player));
-//                futures.add(futureTask);
-//                }
-//            }
-//        for (Future<List<Move>> f:futures){
-//            try {
-//                moves.addAll(f.get());
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//            es.shutdown();
 
         if(moves.isEmpty()){
             int i=0;
@@ -130,11 +84,7 @@ public class Board {
             moves.add(new Move(i,j,i,j,0,player, Move.Type.STALL));
         }
         Collections.sort(moves);
-        lastPossiblesMoves=moves;
-        updated=false;
-        invocation++;
-        meanWidth+=moves.size();
-//        System.out.println(moves);
+
         return moves;
 
     }
@@ -396,9 +346,7 @@ public class Board {
     }
 
     public void makeMove(Move m){
-        wBefore=getWhiteNow();
-        bBefore=getBlackNow();
-        updated=true;
+
         switch (m.getType()){
             case BASE:{
                 board[m.getFromI()][m.getFromJ()]-=m.getN()*m.getPlayerMover();
@@ -425,7 +373,6 @@ public class Board {
 
     }
     public void undoMove(Move m){
-        updated=true;
         switch (m.getType()){
             case BASE:{
                 board[m.getFromI()][m.getFromJ()]+=m.getN()*m.getPlayerMover();
@@ -529,14 +476,13 @@ sb.append("\n");
         return res;
     }
 
-    public double eval(Move move, int player,int depth) {
-        return h.eval(this,move,player,depth);
+    public double eval(Move move, int player) {
+        return h.eval(this,move,player);
     }
     public void setH(Heuristics h){
         this.h=h;
     }
-    public int getWhiteBeforeMove(){return wBefore;}
-    public int getBlackBeforeMove(){return bBefore;}
+
     public int getWhiteNow(){
         int w=0;
         for (int i=0;i<8;i++){
@@ -558,5 +504,4 @@ sb.append("\n");
         return b;
     }
     public int getPlayerNow(int player){return player==WHITE?getWhiteNow():getBlackNow();}
-    public int getPlayerBeforeMove(int player){return player==WHITE?getWhiteBeforeMove():getBlackBeforeMove();}
 }
