@@ -3,15 +3,16 @@ import java.util.stream.Collectors;
 
 public class TimerAlphaBeta {
 
-    public static long startingTime;
+    private static long startingTime;
     public static int MAX_MS = 800;
+    private static int DELTA_MS=25;
     public static double MIN_SHUFFLE = 0.4;
     public static double MAX_SHUFFLE = 0.4;
     public static int MAX_BREADTH = 12;
 
 
     private static double AlphaBeta(Board b, Move move, int maxPlayer, int currPlayer, int currDepth, int maxDepth, double alpha, double beta) {
-        if (getCurrentTime() > MAX_MS) {
+        if (getCurrentTime() > MAX_MS-DELTA_MS) {
             return b.eval(move, maxPlayer);
         }
         if (currDepth == maxDepth || b.checkWinner() != 0) {
@@ -21,14 +22,14 @@ public class TimerAlphaBeta {
             double best = Double.NEGATIVE_INFINITY;
             List<Move> moves = b.getPossibleMoves(currPlayer);
             shuffleWithProb(MAX_SHUFFLE, moves);
-            moves=limit(MAX_BREADTH,moves);
+            moves = limit(MAX_BREADTH, moves);
             for (Move m : moves) {
                 Board copy = b.copy();
                 copy.makeMove(m);
                 double val = AlphaBeta(copy, m, maxPlayer, currPlayer * -1, currDepth + 1, maxDepth, alpha, beta);
                 best = Math.max(best, val);
                 alpha = Math.max(alpha, best);
-                if (alpha >= beta) {
+                if (alpha >= beta||getCurrentTime()>MAX_MS-DELTA_MS) {
                     break;
                 }
             }
@@ -37,14 +38,14 @@ public class TimerAlphaBeta {
             double best = Double.POSITIVE_INFINITY;
             List<Move> moves = b.getPossibleMoves(currPlayer);
             shuffleWithProb(MIN_SHUFFLE, moves);
-            moves=limit(MAX_BREADTH,moves);
+            moves = limit(MAX_BREADTH, moves);
             for (Move m : moves) {
                 Board copy = b.copy();
                 copy.makeMove(m);
                 double val = AlphaBeta(copy, m, maxPlayer, currPlayer * -1, currDepth + 1, maxDepth, alpha, beta);
                 best = Math.min(best, val);
                 beta = Math.min(beta, best);
-                if (alpha >= beta) {
+                if (alpha >= beta||getCurrentTime()>MAX_MS-DELTA_MS) {
                     break;
                 }
 
@@ -62,7 +63,7 @@ public class TimerAlphaBeta {
     private static synchronized Pair<Move, Double> AlphaBetaAlg2(Board b, int player, int depthMax) {
 
         List<Move> moves = b.getPossibleMoves(player);
-        moves=limit(MAX_BREADTH,moves);
+        moves = limit(MAX_BREADTH, moves);
         List<Double> max = moves.parallelStream().map(m -> {
             Board copy = b.copy();
             copy.makeMove(m);
@@ -85,6 +86,7 @@ public class TimerAlphaBeta {
     }
 
     private static List<Move> limit(int n, List<Move> moves) {
+
         moves = moves.subList(0, Math.min(n, moves.size()));
         return moves;
     }

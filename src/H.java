@@ -1,7 +1,7 @@
 import java.util.List;
 import java.util.Random;
 
-public class H_anto3 extends Heuristics {
+public class H extends Heuristics {
 
     private int getNumPedine(int player, Board b){
         return player==Board.WHITE?b.getWhiteNow():b.getBlackNow();
@@ -24,11 +24,11 @@ public class H_anto3 extends Heuristics {
         if (!isMaximizer)sign=-1.;
 
         double sum = 0.0;
-        if(b.getWhiteNow()-b.getBlackNow()!=0)
-            return sign*Math.pow(2,b.getPlayerNow(player))
+        if(b.getWhiteNow()-b.getBlackNow()!=0) {
+            return sign * Math.pow(2, b.getPlayerNow(player))
 
-                    -Math.pow(2,b.getPlayerNow(otherPlayer));
-
+                    - Math.pow(2, b.getPlayerNow(otherPlayer));
+        }
         switch (m.getType()){
             case CAPTURE:
                 sum = sign*(

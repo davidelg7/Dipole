@@ -83,6 +83,8 @@ public class Board {
                         break;}
             moves.add(new Move(i,j,i,j,0,player, Move.Type.STALL));
         }
+
+
         Collections.sort(moves);
 
         return moves;

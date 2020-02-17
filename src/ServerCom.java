@@ -16,7 +16,7 @@ public class ServerCom extends Thread {
     }
     //*****************************************
 
-    private Board b = new Board(new H_anto3());
+    private Board b = new Board(new H());
     ;
     private int player;
     private Socket s;
@@ -66,6 +66,7 @@ public class ServerCom extends Thread {
 
     @Override
     public void run() {
+        int i=0;
         while (!s.isClosed()) {
             String line = sc.nextLine();
             String[] split = line.split(" ");
@@ -74,13 +75,15 @@ public class ServerCom extends Thread {
             }
 
             if (split[0].contains("YOUR_TURN")) {
-
-                Move m = TimerAlphaBeta.AlphaBeta(b, player, DEPTH);
+                i++;
+                Move m = TimerAlphaBeta.AlphaBeta(b, player, DEPTH+i/8);
+                System.out.println(i/10+DEPTH);
                 b.makeMove(m);
                 pw.println(new Message(m.getFromI(), m.getFromJ(), m.getToI(), m.getToJ()).message);
                 pw.flush();
             }
             if (split[0].contains("OPPONENT_MOVE")) {
+                i++;
                 String[] m = split[1].split(",");
                 Move tmp = traduciMossa(m[0], m[1], Integer.parseInt(m[2]), b.otherPlayer(player));
                 List<Move> list = b.getPossibleMoves(b.otherPlayer(player));
