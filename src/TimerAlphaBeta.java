@@ -9,7 +9,7 @@ public class TimerAlphaBeta {
     public static double MIN_SHUFFLE = 0.4;
     public static double MAX_SHUFFLE = 0.4;
     public static int MAX_BREADTH = 12;
-
+    private static int Nfoglie=0;
 
     private static double AlphaBeta(Board b, Move move, int maxPlayer, int currPlayer, int currDepth, int maxDepth, double alpha, double beta) {
         if (getCurrentTime() > MAX_MS-DELTA_MS) {
@@ -61,8 +61,8 @@ public class TimerAlphaBeta {
     }
 
     private static synchronized Pair<Move, Double> AlphaBetaAlg2(Board b, int player, int depthMax) {
-
         List<Move> moves = b.getPossibleMoves(player);
+
         moves = limit(MAX_BREADTH, moves);
         List<Double> max = moves.parallelStream().map(m -> {
             Board copy = b.copy();
@@ -70,6 +70,7 @@ public class TimerAlphaBeta {
             double d = AlphaBeta(copy, m, player, player * -1, 0, depthMax, Integer.MIN_VALUE, Integer.MAX_VALUE);
             return d;
         }).collect(Collectors.toList());
+
         int indexOfMax = max.indexOf(max.stream().max(Double::compareTo).get());
         List<Move> bestMoves = new LinkedList<>();
         for (int i = 0; i < moves.size(); i++) {

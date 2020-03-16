@@ -230,10 +230,10 @@ public class H extends Heuristics {
     private int[] sidedsAndTopBottom(Board b, int player){
         int lati=0;
         for (int i = 0; i <8 ; i++)
-            if (b.isPositionOfPlayer(i,0,player))
+            if (b.isPositionOfPlayer(b.getBoard(),i,0,player))
                 lati+=Math.abs(b.get(i,0));
         for (int i = 0; i <8 ; i++)
-            if (b.isPositionOfPlayer(i,7,player))
+            if (b.isPositionOfPlayer(b.getBoard(),i,7,player))
                 lati+=Math.abs(b.get(i,7));
 
 
@@ -242,13 +242,13 @@ public class H extends Heuristics {
         //SCONSIGLIABILE PER IL BIANCO
         if(player==Board.WHITE)
             for (int j = 0; j < 8; j++) {
-                if (b.isPositionOfPlayer(0, j, player))
+                if (b.isPositionOfPlayer(b.getBoard(),0, j, player))
                     topBottom += Math.abs(b.get(0, j));
             }
         else
             //RIGA SCONSIGLIABILE PER IL NERO
             for (int j = 0; j < 8; j++) {
-                if (b.isPositionOfPlayer(7, j, player))
+                if (b.isPositionOfPlayer(b.getBoard(),7, j, player))
                     topBottom+= Math.abs(b.get(7, j));
             }
         return new int[]{lati,topBottom};

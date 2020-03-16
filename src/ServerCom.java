@@ -77,7 +77,6 @@ public class ServerCom extends Thread {
             if (split[0].contains("YOUR_TURN")) {
                 i++;
                 Move m = TimerAlphaBeta.AlphaBeta(b, player, DEPTH+i/8);
-                System.out.println(i/10+DEPTH);
                 b.makeMove(m);
                 pw.println(new Message(m.getFromI(), m.getFromJ(), m.getToI(), m.getToJ()).message);
                 pw.flush();
